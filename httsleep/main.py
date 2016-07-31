@@ -13,12 +13,14 @@ VALID_CONDITIONS = ['status_code', 'json', 'jsonpath', 'text']
 
 class HttSleep(object):
     def __init__(self, url_or_request, until, error=None,
+                 auth=None,
                  polling_interval=DEFAULT_POLLING_INTERVAL,
                  max_retries=None,
                  ignore_exceptions=None,
                  loglevel=logging.ERROR):
         if isinstance(url_or_request, basestring):
-            self.request = requests.Request(method='GET', url=url_or_request)
+            self.request = requests.Request(
+                method='GET', url=url_or_request, auth=auth)
         elif isinstance(url_or_request, requests.Request):
             self.request = url_or_request
         else:
