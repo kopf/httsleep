@@ -100,21 +100,3 @@ class HttSleep(object):
 
 def httsleep(*args, **kwargs):
     return HttSleep(*args, **kwargs).run()
-
-# httsleep
-#
-# response examples:
-# {'status_code': 200, 'text': 'OK!'}
-#   status code is 200 AND text is OK!
-# {'status_code': [200, 201], 'text': 'gg'}
-#   status code is 200 OR 201 AND text is gg
-# [{'status_code': 200, 'text': 'OK!'}, {'status_code': 201, 'text': 'gg'}]
-#   status code is 200 AND text is OK! OR status code is 201 AND text is gg
-#
-# until kwarg: dict of expected response, or list of ok responses.
-# error kwarg: same for errors. Causes a HttSleepError to be raised.
-#              This has e.response set to the response and e.broken_rule set to the rule that was broken.
-#              Errors are checked FIRST, then we look for the 'until' case.
-# ignore_exceptions kwarg. automatically casts to tuple(). (e.g. for JSONDecodeErrors)
-#                          Inside run - if raised, pass and log and sleep and retry.
-# loglevel kwarg: set the loglevel. use self.log to log.
