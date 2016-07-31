@@ -68,13 +68,6 @@ def test_error():
     assert obj.error == [{'status_code': 500}]
 
 
-def test_empty_error():
-    with pytest.raises(ValueError):
-        obj = HttSleep(URL, CONDITION, error={})
-    with pytest.raises(ValueError):
-        obj = HttSleep(URL, CONDITION, error=[{}])
-
-
 def test_invalid_error():
     with pytest.raises(ValueError):
         obj = HttSleep(URL, CONDITION, error={'lol': 'invalid'})

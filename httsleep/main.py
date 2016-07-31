@@ -57,14 +57,9 @@ class HttSleep(object):
                 if condition.get('status_code'):
                     condition['status_code'] = int(condition['status_code'])
                 value.append(condition)
-        elif attribute == 'error' and conditions is None:
-            # This is allowed
-            value = None
-        else:
-            raise ValueError('Empty value {} for {} attribute not allowed'.format(conditions, attribute))
 
-        if value == []:
-            raise ValueError('No valid conditions for attribute "{}" provided'.format(attribute))
+        if value == [] and attribute == 'until':
+            raise ValueError('No valid success conditions provided')
 
         setattr(self, '_{}'.format(attribute), value)
 
@@ -102,7 +97,7 @@ class HttSleep(object):
             self.log.info('Not ready, waiting {} seconds...'.format(self.polling_interval))
             sleep(self.polling_interval)
 
-    @classmethod
+    @staticmethod
     def meets_condition(response, condition):
         if condition.get('status_code') and response.status_code != condition['status_code']:
             return False
