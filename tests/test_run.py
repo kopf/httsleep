@@ -6,8 +6,7 @@ import mock
 import pytest
 from requests.exceptions import ConnectionError
 
-
-from httsleep.main import HttSleep, HttSleepError
+from httsleep.main import HttSleep, HttSleepError, DEFAULT_POLLING_INTERVAL
 
 URL = 'http://example.com'
 
@@ -54,6 +53,26 @@ def test_run_retries():
         assert mock_sleep.call_count == 2
     assert resp.status_code == 200
     assert resp.text == '<html></html>'
+
+
+@httpretty.activate
+def test_run_sleep_default_interval():
+    responses = [httpretty.Response(body="Internal Server Error", status=500),
+                 httpretty.Response(body="<html></html>", status=200)]
+    httpretty.register_uri(httpretty.GET, URL, responses=responses)
+    with mock.patch('httsleep.main.sleep') as mock_sleep:
+        resp = HttSleep(URL, {'status_code': 200}).run()
+        assert mock_sleep.called_once_with(DEFAULT_POLLING_INTERVAL)
+
+
+@httpretty.activate
+def test_run_sleep_custom_interval():
+    responses = [httpretty.Response(body="Internal Server Error", status=500),
+                 httpretty.Response(body="<html></html>", status=200)]
+    httpretty.register_uri(httpretty.GET, URL, responses=responses)
+    with mock.patch('httsleep.main.sleep') as mock_sleep:
+        resp = HttSleep(URL, {'status_code': 200}, polling_interval=6).run()
+        assert mock_sleep.called_once_with(6)
 
 
 @httpretty.activate
