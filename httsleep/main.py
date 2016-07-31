@@ -24,7 +24,10 @@ class HttSleep(object):
             raise ValueError('url_or_request must be a string containing a URL'
                              ' or a requests.Request object')
 
-        self.ignore_exceptions = tuple(ignore_exceptions)
+        if ignore_exceptions:
+            self.ignore_exceptions = tuple(ignore_exceptions)
+        else:
+            self.ignore_exceptions = (None,)
 
         if max_retries is not None:
             self.max_retries = int(max_retries)
@@ -50,16 +53,17 @@ class HttSleep(object):
         self.error = []
         if isinstance(error, dict):
             error = [error]
-        for condition in error:
-            if not condition:
-                # ignore empty dicts
-                continue
-            for key in condition:
-                if key not in VALID_CONDITIONS:
-                    raise ValueError('Invalid key "{}" in condition: {}'.format(key, condition))
-            if condition.get('status_code'):
-                condition['status_code'] = int(condition['status_code'])
-            self.error.append(condition)
+        if error:
+            for condition in error:
+                if not condition:
+                    # ignore empty dicts
+                    continue
+                for key in condition:
+                    if key not in VALID_CONDITIONS:
+                        raise ValueError('Invalid key "{}" in condition: {}'.format(key, condition))
+                if condition.get('status_code'):
+                    condition['status_code'] = int(condition['status_code'])
+                self.error.append(condition)
 
         self.polling_interval = int(polling_interval)
 
