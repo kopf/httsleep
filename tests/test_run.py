@@ -1,9 +1,11 @@
 import json
 
-import mock
 import httpretty
-from requests.exceptions import ConnectionError
+from jsonpath_rw.jsonpath import Fields, Slice
+import mock
 import pytest
+from requests.exceptions import ConnectionError
+
 
 from httsleep.main import HttSleep, HttSleepError
 
@@ -105,10 +107,66 @@ def test_text_condition():
     assert resp.text == expected
 
 
-# @pytest.skip
-# @httpretty.activate
-# def test_jsonpath_condition():
-#     raise NotImplementedError()
+@httpretty.activate
+def test_jsonpath_condition():
+    payload = {'status': 'SUCCESS'}
+    responses = [httpretty.Response(body=json.dumps(payload), status=200)]
+    httpretty.register_uri(httpretty.GET, URL, responses=responses)
+    with mock.patch('httsleep.main.sleep'):
+        httsleep = HttSleep(URL, {'jsonpath': [{'expression': 'status', 'value': 'SUCCESS'}]})
+        resp = httsleep.run()
+    assert resp.status_code == 200
+    assert resp.json() == payload
+
+
+@httpretty.activate
+def test_precompiled_jsonpath_expression():
+    payload = {'status': 'SUCCESS'}
+    responses = [httpretty.Response(body=json.dumps(payload), status=200)]
+    httpretty.register_uri(httpretty.GET, URL, responses=responses)
+    expression = Fields('status')
+    with mock.patch('httsleep.main.sleep'):
+        httsleep = HttSleep(URL, {'jsonpath': [{'expression': expression, 'value': 'SUCCESS'}]})
+        resp = httsleep.run()
+    assert resp.status_code == 200
+    assert resp.json() == payload
+
+
+@httpretty.activate
+def test_jsonpath_condition_multiple_values():
+    payload = {'foo': [{'bar': 1}, {'bar': 2}]}
+    responses = [httpretty.Response(body=json.dumps(payload), status=200)]
+    httpretty.register_uri(httpretty.GET, URL, responses=responses)
+    with mock.patch('httsleep.main.sleep'):
+        httsleep = HttSleep(URL, {'jsonpath': [{'expression': 'foo[*].bar', 'value': [1, 2]}]})
+        resp = httsleep.run()
+    assert resp.status_code == 200
+    assert resp.json() == payload
+
+
+@httpretty.activate
+def test_jsonpath_condition_multiple_values():
+    payload = {'foo': [{'bar': 1}, {'bar': 2}]}
+    responses = [httpretty.Response(body=json.dumps(payload), status=200)]
+    httpretty.register_uri(httpretty.GET, URL, responses=responses)
+    with mock.patch('httsleep.main.sleep'):
+        httsleep = HttSleep(URL, {'jsonpath': [{'expression': 'foo[*].bar', 'value': [1, 2]}]})
+        resp = httsleep.run()
+    assert resp.status_code == 200
+    assert resp.json() == payload
+
+
+@httpretty.activate
+def test_multiple_jsonpath_conditions():
+    payload = {'foo': [{'bar': 1}, {'bar': 2}]}
+    responses = [httpretty.Response(body=json.dumps(payload), status=200)]
+    httpretty.register_uri(httpretty.GET, URL, responses=responses)
+    with mock.patch('httsleep.main.sleep'):
+        httsleep = HttSleep(URL, {'jsonpath': [{'expression': 'foo[0].bar', 'value': 1},
+                                               {'expression': 'foo[1].bar', 'value': 2}]})
+        resp = httsleep.run()
+    assert resp.status_code == 200
+    assert resp.json() == payload
 
 
 @httpretty.activate

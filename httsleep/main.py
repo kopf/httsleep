@@ -1,6 +1,7 @@
 import logging
 from time import sleep
 
+import jsonpath_rw
 import requests
 
 from exceptions import HttSleepError
@@ -105,8 +106,22 @@ class HttSleep(object):
             return False
         if condition.get('text') and response.text != condition['text']:
             return False
-        #if condition.get('jsonpath'):
-        #    return False if .....
+        if condition.get('jsonpath'):
+            for jsonpath in condition['jsonpath']:
+                if isinstance(jsonpath['expression'], basestring):
+                    expression = jsonpath_rw.parse(jsonpath['expression'])
+                else:
+                    expression = jsonpath['expression']
+                value = jsonpath['value']
+                results = expression.find(response.json())
+                if not results:
+                    return False
+                elif len(results) == 1:
+                    if results[0].value != value:
+                        return False
+                else:
+                    if [result.value for result in results] != value:
+                        return False
         return True
 
 
