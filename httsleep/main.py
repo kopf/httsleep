@@ -34,42 +34,55 @@ class HttSleep(object):
         else:
             self.max_retries = None
 
-        # TODO:
-        # REPLACE THESE WITH TWO PROPERTIES THAT SHARE A SETTER FUNCTION FOR VALIDATION
-        self.until = []
-        if isinstance(until, dict):
-            until = [until]
-        for condition in until:
-            if not condition:
-                # ignore empty dicts
-                continue
-            for key in condition:
-                if key not in VALID_CONDITIONS:
-                    raise ValueError('Invalid key "{}" in condition: {}'.format(key, condition))
-            if condition.get('status_code'):
-                condition['status_code'] = int(condition['status_code'])
-            self.until.append(condition)
+        self.until = until
+        self.error = error
+        self.polling_interval = int(polling_interval)
+        self.session = requests.Session()
+        self.log = logging.getLogger()
+        self.log.setLevel(loglevel)
 
-        self.error = []
-        if isinstance(error, dict):
-            error = [error]
-        if error:
-            for condition in error:
+    def set_conditions(self, attribute, conditions):
+        value = []
+        if isinstance(conditions, dict):
+            conditions = [conditions]
+        if conditions:
+            for condition in conditions:
                 if not condition:
                     # ignore empty dicts
                     continue
                 for key in condition:
                     if key not in VALID_CONDITIONS:
-                        raise ValueError('Invalid key "{}" in condition: {}'.format(key, condition))
+                        raise ValueError(
+                            'Invalid key "{}" in condition: {}'.format(key, condition))
                 if condition.get('status_code'):
                     condition['status_code'] = int(condition['status_code'])
-                self.error.append(condition)
+                value.append(condition)
+        elif attribute == 'error' and conditions is None:
+            # This is allowed
+            value = None
+        else:
+            raise ValueError('Empty value {} for {} attribute not allowed'.format(conditions, attribute))
 
-        self.polling_interval = int(polling_interval)
+        if value == []:
+            raise ValueError('No valid conditions for attribute "{}" provided'.format(attribute))
 
-        self.session = requests.Session()
-        self.log = logging.getLogger()
-        self.log.setLevel(loglevel)
+        setattr(self, '_{}'.format(attribute), value)
+
+    @property
+    def error(self):
+        return self._error
+
+    @error.setter
+    def error(self, value):
+        return self.set_conditions('error', value)
+
+    @property
+    def until(self):
+        return self._until
+
+    @until.setter
+    def until(self, value):
+        return self.set_conditions('until', value)
 
     def run(self):
         while True:
