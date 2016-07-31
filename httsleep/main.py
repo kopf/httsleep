@@ -12,7 +12,8 @@ VALID_CONDITIONS = ['status_code', 'json', 'jsonpath', 'text']
 
 
 class HttSleep(object):
-    def __init__(self, url_or_request, until, error=None,
+    def __init__(self, url_or_request, until=None, error=None,
+                 status_code=None, json=None, jsonpath=None, text=None,
                  auth=None,
                  polling_interval=DEFAULT_POLLING_INTERVAL,
                  max_retries=None,
@@ -37,6 +38,16 @@ class HttSleep(object):
         else:
             self.max_retries = None
 
+        if until is None and not (status_code or json or jsonpath or text):
+            msg = ("No success conditions provided! Either the 'until' kwarg"
+                   " or one of the individual condition kwargs must be provided.")
+            raise ValueError(msg)
+        elif until is None:
+            until = []
+            condition = {'status_code': status_code, 'json': json,
+                         'jsonpath': jsonpath, 'text': text}
+            until.append({k: v for k, v in condition.iteritems() if v})
+
         self.until = until
         self.error = error
         self.polling_interval = int(polling_interval)
@@ -59,6 +70,7 @@ class HttSleep(object):
                             'Invalid key "{}" in condition: {}'.format(key, condition))
                 if condition.get('status_code'):
                     condition['status_code'] = int(condition['status_code'])
+                # TODO: Add validation for jsonpath
                 value.append(condition)
 
         if value == [] and attribute == 'until':
