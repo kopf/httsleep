@@ -132,7 +132,8 @@ The `until` kwarg is placed directly after the `url_or_request` parameter, so we
 We can chain a list of conditionals with boolean OR by using a list:
 
 ```
-httsleep('http://myendpoint/jobs/1', until=[{'json': {'status': 'SUCCESS'}}, {'json': {'status': 'PENDING'}}])
+httsleep('http://myendpoint/jobs/1',
+         until=[{'json': {'status': 'SUCCESS'}}, {'json': {'status': 'PENDING'}}])
 ```
 
 This means, "sleep until the json response is `{'status': 'SUCCESS'}` OR `{'status': 'PENDING'}`".
@@ -166,7 +167,9 @@ We can see how far this can be taken (perhaps too far) in the next example:
 ```
 until = [{'status_code': 200, 'jsonpath': [{'expression': 'status', 'value': 'OK'}]}
 error = [{'json': {'status': 'ERROR'}},
-         {'jsonpath': [{'expression': 'status', 'value': 'UNKNOWN'}, {'expression': 'status', 'value': 'DYING'}], 'func': is_job_really_failing},
+         {'jsonpath': [{'expression': 'status', 'value': 'UNKNOWN'},
+                       {'expression': 'status', 'value': 'DYING'}],
+          'func': is_job_really_failing},
          {'status_code': 404}]
 httsleep('http://myendpoint/jobs/1', until, error=error)
 ```
