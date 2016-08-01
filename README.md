@@ -29,7 +29,8 @@ exceptions we'd like to ignore:
 
 ```
 from requests.exceptions import ConnectionError
-httsleep('http://myendpoint/jobs/1', status_code=200, json={'status': 'SUCCESS'}, ignore_exceptions=[ConnectionError])
+httsleep('http://myendpoint/jobs/1', status_code=200, json={'status': 'SUCCESS'},
+         ignore_exceptions=[ConnectionError])
 ```
 
 By specifying both a `status_code` and `json` kwarg, joined the two "conditionals" with a boolean AND. More on this in the section "Chaining Conditionals" below.
