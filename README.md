@@ -85,8 +85,8 @@ and forget about everything else. The server might put things, such as the job c
 timestamp in the JSON response, which will make comparing using `json=` impossible. This is where JSONPath really shines.
 
 You might notice that the `jsonpath` kwarg value is a list. A response has only one status code, and only one body, but
-any one of many jsonpaths might evaluate true for the JSON content returned. Therefore, you can string multiple JSONPaths
-together in a list. Logically, they will be evaluated with a boolean OR.
+multiple jsonpaths might evaluate true for the JSON content returned. Therefore, you can string multiple JSONPaths
+together in a list. Logically, they will be evaluated with a boolean AND.
 
 In addition, the `expression` value may be a string representing a JSONPath, or a precompiled JSONPath. The following call
 is equivalent to the previous example:
@@ -169,7 +169,7 @@ We can see how far this can be taken (perhaps too far) in the next example:
 until = [{'status_code': 200, 'jsonpath': [{'expression': 'status', 'value': 'OK'}]}
 error = [{'json': {'status': 'ERROR'}},
          {'jsonpath': [{'expression': 'status', 'value': 'UNKNOWN'},
-                       {'expression': 'status', 'value': 'DYING'}],
+                       {'expression': 'owner', 'value': 'Chris'}],
           'func': is_job_really_failing},
          {'status_code': 404}]
 httsleep('http://myendpoint/jobs/1', until, error=error)
@@ -180,7 +180,7 @@ httsleep('http://myendpoint/jobs/1', until, error=error)
     * AND the `status` key in its response has the value `OK`
 * but raise an error if
     * the `status` key has the value `ERROR`
-    * OR the `status` key has the value `UNKNOWN` OR `DYING` AND the function `is_job_really_dying` doesn't return `False`
+    * OR the `status` key has the value `UNKNOWN` AND the `owner` key has the value `Chris` AND the function `is_job_really_dying` doesn't return `False`
     * OR the status code is 404
 
 ## TODO
