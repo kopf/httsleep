@@ -189,6 +189,22 @@ def test_multiple_jsonpath_conditions():
 
 
 @httpretty.activate
+def test_func_condition():
+    def my_func(req):
+        if 'very very' in req.text:
+            return True
+        return False
+    text = "Some very very long text here with <b>maybe</b> some html too"
+    responses = [httpretty.Response(body='not found', status=404),
+                 httpretty.Response(body=text, status=200)]
+    httpretty.register_uri(httpretty.GET, URL, responses=responses)
+    with mock.patch('httsleep.main.sleep'):
+        resp = HttSleep(URL, {'func': my_func}).run()
+    assert resp.status_code == 200
+    assert resp.text == text
+
+
+@httpretty.activate
 def test_multiple_success_conditions():
     responses = [httpretty.Response(body='first response', status=200),
                  httpretty.Response(body='second response', status=200),
