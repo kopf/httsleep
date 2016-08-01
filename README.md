@@ -7,12 +7,13 @@ httsleep is a powerful polling library for Python.
 Let's say we're talking to a RESTful API, and we've just created a 'job'. We know
 its ID (`1`), so we're able to poll for its current status.
 
-The simplest example of this would be to poll its endpoint until we get a HTTP 200 OK back:
+The simplest example of this would be to poll its endpoint until we get a HTTP 200 OK back.
+Once successful, `httsleep` will return the response:
 
 ```
 from httsleep import httsleep
 
-httsleep('http://myendpoint/jobs/1', status_code=200)
+resp = httsleep('http://myendpoint/jobs/1', status_code=200)
 ```
 
 You can, of course, change the default polling interval (2 seconds) and the default number of retries (50), along
