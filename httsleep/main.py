@@ -9,12 +9,12 @@ from exceptions import HttSleepError
 
 DEFAULT_POLLING_INTERVAL = 2 # in seconds
 DEFAULT_MAX_RETRIES = 50
-VALID_CONDITIONS = ['status_code', 'json', 'jsonpath', 'text', 'func']
+VALID_CONDITIONS = ['status_code', 'json', 'jsonpath', 'text', 'callback']
 
 
 class HttSleep(object):
     def __init__(self, url_or_request, until=None, error=None,
-                 status_code=None, json=None, jsonpath=None, text=None, func=None,
+                 status_code=None, json=None, jsonpath=None, text=None, callback=None,
                  auth=None, headers=None,
                  polling_interval=DEFAULT_POLLING_INTERVAL,
                  max_retries=DEFAULT_MAX_RETRIES,
@@ -46,7 +46,7 @@ class HttSleep(object):
         elif until is None:
             until = []
             condition = {'status_code': status_code, 'json': json,
-                         'jsonpath': jsonpath, 'text': text, 'func': func}
+                         'jsonpath': jsonpath, 'text': text, 'callback': callback}
             until.append({k: v for k, v in condition.iteritems() if v})
 
         self.until = until
@@ -137,8 +137,8 @@ class HttSleep(object):
                 else:
                     if [result.value for result in results] != value:
                         return False
-        if condition.get('func'):
-            if condition['func'](response) == False:
+        if condition.get('callback'):
+            if condition['callback'](response) == False:
                 return False
         return True
 

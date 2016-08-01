@@ -98,7 +98,7 @@ httsleep('http://myendpoint/jobs/1', jsonpath=[{'expression': Fields('status'), 
 
 Refer to the [jsonpath-rw](http://jsonpath-rw.readthedocs.io/en/latest/) documentation for more.
 
-### `func`
+### `callback`
 
 Execute a callback function on the response. This function should return False if the response does not match.
 
@@ -113,7 +113,7 @@ def my_callback(response):
         return False
 
 
-httsleep('http://myendpoint/jobs/1', func=my_callback)
+httsleep('http://myendpoint/jobs/1', callback=my_callback)
 ```
 
 ## Chaining conditionals
@@ -170,7 +170,7 @@ until = [{'status_code': 200, 'jsonpath': [{'expression': 'status', 'value': 'OK
 error = [{'json': {'status': 'ERROR'}},
          {'jsonpath': [{'expression': 'status', 'value': 'UNKNOWN'},
                        {'expression': 'owner', 'value': 'Chris'}],
-          'func': is_job_really_failing},
+          'callback': is_job_really_failing},
          {'status_code': 404}]
 httsleep('http://myendpoint/jobs/1', until, error=error)
 ```
