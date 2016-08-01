@@ -9,6 +9,8 @@ REQUEST = requests.Request(method='GET', url=URL)
 CONDITION = {'status_code': 200}
 
 # TODO: tests for kwarg conditions
+# TODO: tests for headers/auth etc kwargs
+#
 
 def test_request_built_from_url():
     obj = HttSleep(URL, CONDITION)

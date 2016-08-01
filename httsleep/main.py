@@ -8,20 +8,21 @@ from exceptions import HttSleepError
 
 
 DEFAULT_POLLING_INTERVAL = 2 # in seconds
+DEFAULT_MAX_RETRIES = 50
 VALID_CONDITIONS = ['status_code', 'json', 'jsonpath', 'text']
 
 
 class HttSleep(object):
     def __init__(self, url_or_request, until=None, error=None,
                  status_code=None, json=None, jsonpath=None, text=None,
-                 auth=None,
+                 auth=None, headers=None,
                  polling_interval=DEFAULT_POLLING_INTERVAL,
-                 max_retries=None,
+                 max_retries=DEFAULT_MAX_RETRIES,
                  ignore_exceptions=None,
                  loglevel=logging.ERROR):
         if isinstance(url_or_request, basestring):
             self.request = requests.Request(
-                method='GET', url=url_or_request, auth=auth)
+                method='GET', url=url_or_request, auth=auth, headers=headers)
         elif isinstance(url_or_request, requests.Request):
             self.request = url_or_request
         else:
