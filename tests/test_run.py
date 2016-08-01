@@ -1,7 +1,7 @@
 import json
 
 import httpretty
-from jsonpath_rw.jsonpath import Fields, Slice
+from jsonpath_rw.jsonpath import Fields
 import mock
 import pytest
 from requests.exceptions import ConnectionError
