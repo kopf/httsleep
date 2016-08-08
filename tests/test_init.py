@@ -8,8 +8,6 @@ URL = 'http://example.com'
 REQUEST = requests.Request(method='GET', url=URL)
 CONDITION = {'status_code': 200}
 
-# TODO: tests for kwarg conditions
-#
 
 def test_request_built_from_url():
     obj = HttSleep(URL, CONDITION)
@@ -94,3 +92,20 @@ def test_invalid_alarms():
 def test_status_code_cast_as_int_in_alarm():
     obj = HttSleep(URL, CONDITION, alarms={'status_code': '500'})
     assert obj.alarms[0]['status_code'] == 500
+
+
+def test_kwarg_condition():
+    def myfunc(*args):
+        return
+    obj = HttSleep(URL, status_code=200)
+    assert obj.until == [{'status_code': 200}]
+    obj = HttSleep(URL, json={'status': 'SUCCESS'})
+    assert obj.until == [{'json': {'status': 'SUCCESS'}}]
+    obj = HttSleep(URL, jsonpath={'expression': 'status', 'value': 'SUCCESS'})
+    assert obj.until == [{'jsonpath': {'expression': 'status', 'value': 'SUCCESS'}}]
+    obj = HttSleep(URL, text='done')
+    assert obj.until == [{'text': 'done'}]
+    obj = HttSleep(URL, callback=myfunc)
+    assert obj.until == [{'callback': myfunc}]
+    obj = HttSleep(URL, status_code=200, callback=myfunc, json={'status': 'success'})
+    assert obj.until == [{'status_code': 200, 'callback': myfunc, 'json': {'status': 'success'}}]
