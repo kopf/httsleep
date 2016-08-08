@@ -1,8 +1,7 @@
 import requests
 import pytest
 
-from httsleep.main import HttSleep
-
+from httsleep.main import HttSleep, _DummyException
 
 URL = 'http://example.com'
 REQUEST = requests.Request(method='GET', url=URL)
@@ -28,7 +27,7 @@ def test_url_or_request():
 
 def test_ignore_exceptions_default_value():
     obj = HttSleep(URL, CONDITION)
-    assert obj.ignore_exceptions == (None,)
+    assert obj.ignore_exceptions == (_DummyException,)
 
     obj = HttSleep(URL, CONDITION, ignore_exceptions=[ValueError, Exception])
     assert obj.ignore_exceptions == (ValueError, Exception)

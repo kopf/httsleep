@@ -4,12 +4,17 @@ from time import sleep
 import jsonpath_rw
 import requests
 
-from exceptions import HttSleepError
+from .exceptions import HttSleepError
+from ._compat import string_types
 
 
 DEFAULT_POLLING_INTERVAL = 2 # in seconds
 DEFAULT_MAX_RETRIES = 50
 VALID_CONDITIONS = ['status_code', 'json', 'jsonpath', 'text', 'callback']
+
+
+class _DummyException(Exception):
+    pass
 
 
 class HttSleep(object):
@@ -20,7 +25,7 @@ class HttSleep(object):
                  max_retries=DEFAULT_MAX_RETRIES,
                  ignore_exceptions=None,
                  loglevel=logging.ERROR):
-        if isinstance(url_or_request, basestring):
+        if isinstance(url_or_request, string_types):
             self.request = requests.Request(
                 method='GET', url=url_or_request, auth=auth, headers=headers)
         elif isinstance(url_or_request, requests.Request):
@@ -32,7 +37,7 @@ class HttSleep(object):
         if ignore_exceptions:
             self.ignore_exceptions = tuple(ignore_exceptions)
         else:
-            self.ignore_exceptions = (None,)
+            self.ignore_exceptions = (_DummyException,)
 
         if max_retries is not None:
             self.max_retries = int(max_retries)
@@ -123,7 +128,7 @@ class HttSleep(object):
             return False
         if condition.get('jsonpath'):
             for jsonpath in condition['jsonpath']:
-                if isinstance(jsonpath['expression'], basestring):
+                if isinstance(jsonpath['expression'], string_types):
                     expression = jsonpath_rw.parse(jsonpath['expression'])
                 else:
                     expression = jsonpath['expression']
