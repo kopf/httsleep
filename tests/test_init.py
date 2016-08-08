@@ -9,7 +9,6 @@ REQUEST = requests.Request(method='GET', url=URL)
 CONDITION = {'status_code': 200}
 
 # TODO: tests for kwarg conditions
-# TODO: tests for headers/auth etc kwargs
 #
 
 def test_request_built_from_url():
@@ -24,6 +23,18 @@ def test_url_or_request():
     HttSleep(REQUEST, CONDITION)
     with pytest.raises(ValueError):
         HttSleep(123, CONDITION)
+
+
+def test_auth():
+    auth = ('myuser', 'mypass')
+    obj = HttSleep(URL, CONDITION, auth=auth)
+    assert obj.request.auth == auth
+
+
+def test_headers():
+    headers = {'User-Agent': 'httsleep'}
+    obj = HttSleep(URL, CONDITION, headers=headers)
+    assert obj.request.headers == headers
 
 
 def test_ignore_exceptions_default_value():
