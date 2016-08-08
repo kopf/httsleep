@@ -39,7 +39,7 @@ def test_max_retries_default_value():
     assert obj.max_retries == 123
 
     with pytest.raises(ValueError):
-        obj = HttSleep(URL, CONDITION, max_retries='five')
+        HttSleep(URL, CONDITION, max_retries='five')
 
 
 def test_until():
@@ -49,16 +49,16 @@ def test_until():
 
 def test_empty_until():
     with pytest.raises(ValueError):
-        obj = HttSleep(URL, {})
+        HttSleep(URL, {})
     with pytest.raises(ValueError):
-        obj = HttSleep(URL, [{}])
+        HttSleep(URL, [{}])
 
 
 def test_invalid_until():
     with pytest.raises(ValueError):
-        obj = HttSleep(URL, {'lol': 'invalid'})
+        HttSleep(URL, {'lol': 'invalid'})
     with pytest.raises(ValueError):
-        obj = HttSleep(URL, {'status_code': 200, 'lol': 'invalid'})
+        HttSleep(URL, {'status_code': 200, 'lol': 'invalid'})
 
 
 def test_status_code_cast_as_int():
@@ -66,19 +66,20 @@ def test_status_code_cast_as_int():
     assert obj.until[0]['status_code'] == 200
 
 
-def test_error():
-    obj = HttSleep(URL, CONDITION, error={'status_code': 500})
-    assert obj.error == [{'status_code': 500}]
+def test_alarms():
+    obj = HttSleep(URL, CONDITION, alarms={'status_code': 500})
+    assert obj.alarms == [{'status_code': 500}]
+    obj = HttSleep(URL, CONDITION, alarms=[{'status_code': 500}])
+    assert obj.alarms == [{'status_code': 500}]
 
 
-def test_invalid_error():
+def test_invalid_alarms():
     with pytest.raises(ValueError):
-        obj = HttSleep(URL, CONDITION, error={'lol': 'invalid'})
+        HttSleep(URL, CONDITION, alarms={'lol': 'invalid'})
     with pytest.raises(ValueError):
-        obj = HttSleep(URL, CONDITION,
-                       error={'status_code': 500, 'lol': 'invalid'})
+        HttSleep(URL, CONDITION, alarms={'status_code': 500, 'lol': 'invalid'})
 
 
-def test_status_code_cast_as_int_in_error():
-    obj = HttSleep(URL, CONDITION, error={'status_code': '500'})
-    assert obj.error[0]['status_code'] == 500
+def test_status_code_cast_as_int_in_alarm():
+    obj = HttSleep(URL, CONDITION, alarms={'status_code': '500'})
+    assert obj.alarms[0]['status_code'] == 500

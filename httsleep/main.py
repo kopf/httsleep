@@ -4,7 +4,7 @@ from time import sleep
 import jsonpath_rw
 import requests
 
-from exceptions import HttSleepError
+from exceptions import HttSleepAlarm
 
 
 DEFAULT_POLLING_INTERVAL = 2 # in seconds
@@ -13,7 +13,7 @@ VALID_CONDITIONS = ['status_code', 'json', 'jsonpath', 'text', 'callback']
 
 
 class HttSleep(object):
-    def __init__(self, url_or_request, until=None, error=None,
+    def __init__(self, url_or_request, until=None, alarms=None,
                  status_code=None, json=None, jsonpath=None, text=None, callback=None,
                  auth=None, headers=None,
                  polling_interval=DEFAULT_POLLING_INTERVAL,
@@ -50,7 +50,7 @@ class HttSleep(object):
             until.append({k: v for k, v in condition.iteritems() if v})
 
         self.until = until
-        self.error = error
+        self.alarms = alarms
         self.polling_interval = int(polling_interval)
         self.session = requests.Session()
         self.log = logging.getLogger()
@@ -80,12 +80,12 @@ class HttSleep(object):
         setattr(self, '_{}'.format(attribute), value)
 
     @property
-    def error(self):
-        return self._error
+    def alarms(self):
+        return self._alarms
 
-    @error.setter
-    def error(self, value):
-        return self.set_conditions('error', value)
+    @alarms.setter
+    def alarms(self, value):
+        return self.set_conditions('alarms', value)
 
     @property
     def until(self):
@@ -99,9 +99,9 @@ class HttSleep(object):
         while True:
             try:
                 response = self.session.send(self.request.prepare())
-                for condition in self.error:
+                for condition in self.alarms:
                     if self.meets_condition(response, condition):
-                        raise HttSleepError(response, condition)
+                        raise HttSleepAlarm(response, condition)
                 if any([self.meets_condition(response, condition) for condition in self.until]):
                     return response
             except self.ignore_exceptions as e:
