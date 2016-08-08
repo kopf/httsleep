@@ -4,7 +4,7 @@ from time import sleep
 import jsonpath_rw
 import requests
 
-from exceptions import HttSleepAlarm
+from exceptions import Alarm
 
 
 DEFAULT_POLLING_INTERVAL = 2 # in seconds
@@ -101,7 +101,7 @@ class HttSleep(object):
                 response = self.session.send(self.request.prepare())
                 for condition in self.alarms:
                     if self.meets_condition(response, condition):
-                        raise HttSleepAlarm(response, condition)
+                        raise Alarm(response, condition)
                 if any([self.meets_condition(response, condition) for condition in self.until]):
                     return response
             except self.ignore_exceptions as e:

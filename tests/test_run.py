@@ -6,7 +6,7 @@ import mock
 import pytest
 from requests.exceptions import ConnectionError
 
-from httsleep.main import HttSleep, HttSleepAlarm, DEFAULT_POLLING_INTERVAL
+from httsleep.main import HttSleep, Alarm, DEFAULT_POLLING_INTERVAL
 
 URL = 'http://example.com'
 
@@ -27,7 +27,7 @@ def test_run_alarm():
     """Should raise an HttSleepAlarm when a failure criteria has been reached"""
     httpretty.register_uri(httpretty.GET, URL, body='<html></html>', status=400)
     httsleep = HttSleep(URL, {'status_code': 200}, alarms={'status_code': 400})
-    with pytest.raises(HttSleepAlarm):
+    with pytest.raises(Alarm):
         httsleep.run()
 
 
@@ -36,7 +36,7 @@ def test_run_success_alarm():
     """Make sure failure criteria takes precedence over success criteria (if httsleep is being used incorrectly)"""
     httpretty.register_uri(httpretty.GET, URL, body='', status=200)
     httsleep = HttSleep(URL, {'status_code': 200}, alarms={'text': ''})
-    with pytest.raises(HttSleepAlarm):
+    with pytest.raises(Alarm):
         httsleep.run()
 
 
@@ -232,7 +232,7 @@ def test_multiple_alarms():
         httsleep = HttSleep(URL, {'status_code': 200}, alarms=alarms)
         try:
             httsleep.run()
-        except HttSleepAlarm as e:
+        except Alarm as e:
             assert e.response.status_code == 500
             assert e.response.json() == error_msg
             assert e.alarm == {'json': error_msg, 'status_code': 500}

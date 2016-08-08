@@ -142,14 +142,14 @@ This means, "sleep until the json response is `{'status': 'SUCCESS'}` OR `{'stat
 ## Error conditionals
 
 What if the job we've created fails? We need to be able to respond appropriately, instead of polling the endpoint for a long time,
-waiting for a successful status. To do this, we set an alarm using the `alarms` kwarg. If an error is detected, a HttSleepAlarm exception is raised:
+waiting for a successful status. To do this, we set an alarm using the `alarms` kwarg. If an error is detected, an Alarm exception is raised:
 
 ```
-from httsleep.exceptions import HttSleepAlarm
+from httsleep.exceptions import Alarm
 try:
     httsleep('http://myendpoint/jobs/1', {'status_code': 200, 'json': {'status': 'SUCCESS'}},
              alarms=[{'json': {'status': 'ERROR'}}, {'json': {'status': 'CRITICAL'}}, {'status_code': 500}])
-except HttSleepAlarm as e:
+except Alarm as e:
     if e.response.status_code == 500:
         print "There was an internal system error!"
     else:
