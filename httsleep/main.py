@@ -39,7 +39,7 @@ class HttSleep(object):
         else:
             self.max_retries = None
 
-        if until is None and not (status_code or json or jsonpath or text):
+        if until is None and not (status_code or json or jsonpath or text or callback):
             msg = ("No success conditions provided! Either the 'until' kwarg"
                    " or one of the individual condition kwargs must be provided.")
             raise ValueError(msg)
