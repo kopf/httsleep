@@ -37,7 +37,7 @@ def test_headers():
 
 def test_ignore_exceptions_default_value():
     obj = HttSleep(URL, CONDITION)
-    assert obj.ignore_exceptions == (None,)
+    assert obj.ignore_exceptions == tuple()
 
     obj = HttSleep(URL, CONDITION, ignore_exceptions=[ValueError, Exception])
     assert obj.ignore_exceptions == (ValueError, Exception)
