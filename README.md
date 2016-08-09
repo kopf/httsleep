@@ -182,7 +182,7 @@ httsleep('http://myendpoint/jobs/1', until, alarms=alarms)
     * AND the `status` key in its response has the value `OK`
 * but raise an error if
     * the `status` key has the value `ERROR`
-    * OR the `status` key has the value `UNKNOWN` AND the `owner` key has the value `Chris` AND the function `is_job_really_dying` doesn't return `False`
+    * OR the `status` key has the value `UNKNOWN` AND the `owner` key has the value `Chris` AND the function `is_job_really_dying` returns `False`
     * OR the status code is 404
 
 ## TODO
