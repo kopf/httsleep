@@ -1,5 +1,5 @@
-class HttSleepError(Exception):
-    def __init__(self, response, error_condition):
+class Alarm(Exception):
+    def __init__(self, response, alarm_condition):
         self.response = response
-        self.error_condition = error_condition
-        self.mesg = 'Response matched an error condition: {}'.format(error_condition)
+        self.alarm = alarm_condition
+        self.mesg = 'Response matched an error condition: {}'.format(alarm_condition)

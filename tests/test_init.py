@@ -3,13 +3,11 @@ import pytest
 
 from httsleep.main import HttSleep
 
+
 URL = 'http://example.com'
 REQUEST = requests.Request(method='GET', url=URL)
 CONDITION = {'status_code': 200}
 
-# TODO: tests for kwarg conditions
-# TODO: tests for headers/auth etc kwargs
-#
 
 def test_request_built_from_url():
     obj = HttSleep(URL, CONDITION)
@@ -25,6 +23,18 @@ def test_url_or_request():
         HttSleep(123, CONDITION)
 
 
+def test_auth():
+    auth = ('myuser', 'mypass')
+    obj = HttSleep(URL, CONDITION, auth=auth)
+    assert obj.request.auth == auth
+
+
+def test_headers():
+    headers = {'User-Agent': 'httsleep'}
+    obj = HttSleep(URL, CONDITION, headers=headers)
+    assert obj.request.headers == headers
+
+
 def test_ignore_exceptions_default_value():
     obj = HttSleep(URL, CONDITION)
     assert obj.ignore_exceptions == tuple()
@@ -38,7 +48,7 @@ def test_max_retries_default_value():
     assert obj.max_retries == 123
 
     with pytest.raises(ValueError):
-        obj = HttSleep(URL, CONDITION, max_retries='five')
+        HttSleep(URL, CONDITION, max_retries='five')
 
 
 def test_until():
@@ -48,16 +58,16 @@ def test_until():
 
 def test_empty_until():
     with pytest.raises(ValueError):
-        obj = HttSleep(URL, {})
+        HttSleep(URL, {})
     with pytest.raises(ValueError):
-        obj = HttSleep(URL, [{}])
+        HttSleep(URL, [{}])
 
 
 def test_invalid_until():
     with pytest.raises(ValueError):
-        obj = HttSleep(URL, {'lol': 'invalid'})
+        HttSleep(URL, {'lol': 'invalid'})
     with pytest.raises(ValueError):
-        obj = HttSleep(URL, {'status_code': 200, 'lol': 'invalid'})
+        HttSleep(URL, {'status_code': 200, 'lol': 'invalid'})
 
 
 def test_status_code_cast_as_int():
@@ -65,19 +75,37 @@ def test_status_code_cast_as_int():
     assert obj.until[0]['status_code'] == 200
 
 
-def test_error():
-    obj = HttSleep(URL, CONDITION, error={'status_code': 500})
-    assert obj.error == [{'status_code': 500}]
+def test_alarms():
+    obj = HttSleep(URL, CONDITION, alarms={'status_code': 500})
+    assert obj.alarms == [{'status_code': 500}]
+    obj = HttSleep(URL, CONDITION, alarms=[{'status_code': 500}])
+    assert obj.alarms == [{'status_code': 500}]
 
 
-def test_invalid_error():
+def test_invalid_alarms():
     with pytest.raises(ValueError):
-        obj = HttSleep(URL, CONDITION, error={'lol': 'invalid'})
+        HttSleep(URL, CONDITION, alarms={'lol': 'invalid'})
     with pytest.raises(ValueError):
-        obj = HttSleep(URL, CONDITION,
-                       error={'status_code': 500, 'lol': 'invalid'})
+        HttSleep(URL, CONDITION, alarms={'status_code': 500, 'lol': 'invalid'})
 
 
-def test_status_code_cast_as_int_in_error():
-    obj = HttSleep(URL, CONDITION, error={'status_code': '500'})
-    assert obj.error[0]['status_code'] == 500
+def test_status_code_cast_as_int_in_alarm():
+    obj = HttSleep(URL, CONDITION, alarms={'status_code': '500'})
+    assert obj.alarms[0]['status_code'] == 500
+
+
+def test_kwarg_condition():
+    def myfunc(*args):
+        return
+    obj = HttSleep(URL, status_code=200)
+    assert obj.until == [{'status_code': 200}]
+    obj = HttSleep(URL, json={'status': 'SUCCESS'})
+    assert obj.until == [{'json': {'status': 'SUCCESS'}}]
+    obj = HttSleep(URL, jsonpath={'expression': 'status', 'value': 'SUCCESS'})
+    assert obj.until == [{'jsonpath': {'expression': 'status', 'value': 'SUCCESS'}}]
+    obj = HttSleep(URL, text='done')
+    assert obj.until == [{'text': 'done'}]
+    obj = HttSleep(URL, callback=myfunc)
+    assert obj.until == [{'callback': myfunc}]
+    obj = HttSleep(URL, status_code=200, callback=myfunc, json={'status': 'success'})
+    assert obj.until == [{'status_code': 200, 'callback': myfunc, 'json': {'status': 'success'}}]

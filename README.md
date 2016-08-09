@@ -142,22 +142,22 @@ This means, "sleep until the json response is `{'status': 'SUCCESS'}` OR `{'stat
 ## Error conditionals
 
 What if the job we've created fails? We need to be able to respond appropriately, instead of polling the endpoint for a long time,
-waiting for a successful status. To this end, we use the `error` kwarg. If an error is detected, a HttSleepError exception is raised:
+waiting for a successful status. To do this, we set an alarm using the `alarms` kwarg. If an error is detected, an Alarm exception is raised:
 
 ```
-from httsleep.exceptions import HttSleepError
+from httsleep.exceptions import Alarm
 try:
     httsleep('http://myendpoint/jobs/1', {'status_code': 200, 'json': {'status': 'SUCCESS'}},
-             error=[{'json': {'status': 'ERROR'}}, {'json': {'status': 'CRITICAL'}}, {'status_code': 500}])
-except HttSleepError as e:
+             alarms=[{'json': {'status': 'ERROR'}}, {'json': {'status': 'CRITICAL'}}, {'status_code': 500}])
+except Alarm as e:
     if e.response.status_code == 500:
         print "There was an internal system error!"
     else:
         print "The job has error'd out with status {}!".format(e.response.json()['status'])
-        print "The condition that matched this was {}".format(e.error_condition)
+        print "The condition that matched this was {}".format(e.alarm)
 ```
 
-As shown in this code, the actual response is stored within the exception, along with the error condition that matched the response.
+As shown in this code, the actual response is stored within the exception, along with the alarm condition that matched the response.
 
 ## Going crazy
 
@@ -167,12 +167,12 @@ We can see how far this can be taken (perhaps too far) in the next example:
 
 ```
 until = [{'status_code': 200, 'jsonpath': [{'expression': 'status', 'value': 'OK'}]}
-error = [{'json': {'status': 'ERROR'}},
-         {'jsonpath': [{'expression': 'status', 'value': 'UNKNOWN'},
-                       {'expression': 'owner', 'value': 'Chris'}],
-          'callback': is_job_really_failing},
-         {'status_code': 404}]
-httsleep('http://myendpoint/jobs/1', until, error=error)
+alarms = [{'json': {'status': 'ERROR'}},
+          {'jsonpath': [{'expression': 'status', 'value': 'UNKNOWN'},
+                        {'expression': 'owner', 'value': 'Chris'}],
+           'callback': is_job_really_failing},
+          {'status_code': 404}]
+httsleep('http://myendpoint/jobs/1', until, alarms=alarms)
 ```
 
 * Poll `http://myendpoint/jobs/1` until
