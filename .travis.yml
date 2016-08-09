@@ -4,11 +4,11 @@ python:
     - 3.4
     - 3.5
 script:
-    - pip install coveralls coverage
+    - pip install coveralls pytest-cov
     - pip install -r requirements.txt
     - pip install -r test-requirements.txt
     - pip install .
-    - coverage run --source=httsleep py.test
+    - py.test --cov=httsleep tests/
 after_success:
     - coveralls
 os:
