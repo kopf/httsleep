@@ -4,6 +4,8 @@ httsleep is a powerful polling library for Python.
 
 [![Build Status](https://travis-ci.org/kopf/httsleep.svg?branch=master)](https://travis-ci.org/kopf/httsleep)
 
+[![Coverage Status](https://coveralls.io/repos/github/kopf/httsleep/badge.svg?branch=master)](https://coveralls.io/github/kopf/httsleep?branch=master)
+
 ## Simple examples
 
 Let's say we're talking to a RESTful API, and we've just created a 'job'. We know
