@@ -1,7 +1,7 @@
 import requests
 import pytest
 
-from httsleep.main import HttSleep
+from httsleep.main import HttSleep, DEFAULT_MAX_RETRIES
 
 
 URL = 'http://example.com'
@@ -43,9 +43,15 @@ def test_ignore_exceptions_default_value():
     assert obj.ignore_exceptions == (ValueError, Exception)
 
 
-def test_max_retries_default_value():
+def test_max_retries():
+    obj = HttSleep(URL, CONDITION)
+    assert obj.max_retries == DEFAULT_MAX_RETRIES
+
     obj = HttSleep(URL, CONDITION, max_retries=123)
     assert obj.max_retries == 123
+
+    obj = HttSleep(URL, CONDITION, max_retries=None)
+    assert obj.max_retries == None
 
     with pytest.raises(ValueError):
         HttSleep(URL, CONDITION, max_retries='five')
