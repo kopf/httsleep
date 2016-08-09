@@ -187,6 +187,4 @@ httsleep('http://myendpoint/jobs/1', until, alarms=alarms)
 
 * Finalize API
 * Write documentation (this doesn't count)
-* Package
-* Set up travis-ci integration
 * Release on pypi
