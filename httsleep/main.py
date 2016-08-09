@@ -13,10 +13,6 @@ DEFAULT_MAX_RETRIES = 50
 VALID_CONDITIONS = ['status_code', 'json', 'jsonpath', 'text', 'callback']
 
 
-class _DummyException(Exception):
-    pass
-
-
 class HttSleep(object):
     def __init__(self, url_or_request, until=None, error=None,
                  status_code=None, json=None, jsonpath=None, text=None, callback=None,
@@ -37,7 +33,7 @@ class HttSleep(object):
         if ignore_exceptions:
             self.ignore_exceptions = tuple(ignore_exceptions)
         else:
-            self.ignore_exceptions = (_DummyException,)
+            self.ignore_exceptions = tuple()
 
         if max_retries is not None:
             self.max_retries = int(max_retries)
