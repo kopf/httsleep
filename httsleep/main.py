@@ -48,7 +48,7 @@ class HttSleep(object):
             until = []
             condition = {'status_code': status_code, 'json': json,
                          'jsonpath': jsonpath, 'text': text, 'callback': callback}
-            until.append({k: v for k, v in condition.iteritems() if v})
+            until.append({k: v for k, v in condition.items() if v})
 
         self.until = until
         self.alarms = alarms
