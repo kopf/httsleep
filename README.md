@@ -187,6 +187,5 @@ httsleep('http://myendpoint/jobs/1', until, alarms=alarms)
 
 ## TODO
 
-* Finalize API
 * Write documentation (this doesn't count)
 * Release on pypi
