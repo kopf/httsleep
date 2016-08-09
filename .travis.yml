@@ -10,4 +10,3 @@ script:
     - py.test
 os:
     - linux
-    - osx
