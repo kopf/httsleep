@@ -7,7 +7,7 @@ script:
     - pip install coveralls pytest-cov
     - pip install -r requirements.txt
     - pip install -r test-requirements.txt
-    - pip install .
+    - pip install -e .
     - py.test --cov=httsleep tests/
 after_success:
     - coveralls
