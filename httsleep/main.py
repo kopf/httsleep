@@ -39,6 +39,10 @@ class HttSleeper(object):
     :param ignore_exceptions: a list of exceptions to ignore when polling
                               the endpoint.
     :param loglevel: the loglevel to use. Defaults to `ERROR`.
+
+    ``url_or_request`` must be provided, along with at least one of ``until``,
+    ``status_code``, ``json``, ``jsonpath``, ``text`` or ``callback``.
+
     """
     def __init__(self, url_or_request, until=None, alarms=None,
                  status_code=None, json=None, jsonpath=None, text=None, callback=None,
@@ -123,6 +127,18 @@ class HttSleeper(object):
         return self._set_conditions('until', value)
 
     def run(self):
+        """
+        Polls the endpoint until either:
+
+        * a success condition in ``self.until`` is reached, in which case a
+          :class:`requests.Request` object is returned
+        * an error condition in ``self.alarms`` is encountered, in which case an
+          :class:`Alarm` exception is raised
+        * ``self.max_retries`` is reached, in which case a :class:`StopIteration` exception
+          is raised
+
+        :return: :class:`requests.Response` object.
+        """
         while True:
             try:
                 response = self.session.send(self.request.prepare())
