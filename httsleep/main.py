@@ -83,7 +83,7 @@ class HttSleeper(object):
         self.log = logging.getLogger()
         self.log.setLevel(loglevel)
 
-    def set_conditions(self, attribute, conditions):
+    def _set_conditions(self, attribute, conditions):
         value = []
         if isinstance(conditions, dict):
             conditions = [conditions]
@@ -112,7 +112,7 @@ class HttSleeper(object):
 
     @alarms.setter
     def alarms(self, value):
-        return self.set_conditions('alarms', value)
+        return self._set_conditions('alarms', value)
 
     @property
     def until(self):
@@ -120,7 +120,7 @@ class HttSleeper(object):
 
     @until.setter
     def until(self, value):
-        return self.set_conditions('until', value)
+        return self._set_conditions('until', value)
 
     def run(self):
         while True:
