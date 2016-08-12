@@ -13,7 +13,7 @@ DEFAULT_MAX_RETRIES = 50
 VALID_CONDITIONS = ['status_code', 'json', 'jsonpath', 'text', 'callback']
 
 
-class HttSleep(object):
+class HttSleeper(object):
     def __init__(self, url_or_request, until=None, alarms=None,
                  status_code=None, json=None, jsonpath=None, text=None, callback=None,
                  auth=None, headers=None,
@@ -145,4 +145,11 @@ class HttSleep(object):
 
 
 def httsleep(*args, **kwargs):
-    return HttSleep(*args, **kwargs).run()
+    """ Convenience wrapper for the :class:`.HttSleeper` class.
+    Creates a HttSleeper object and automatically runs it.
+
+    :param args: args used to instantiate the :class:`.HttSleeper` object.
+    :param kwargs: kwargs used to instantiate the :class:`.HttSleeper` object.
+    :return: :class:`requests.Response` object.
+    """
+    return HttSleeper(*args, **kwargs).run()
