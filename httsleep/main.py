@@ -181,7 +181,9 @@ class HttSleeper(object):
                     if [result.value for result in results] != value:
                         return False
         if condition.get('callback'):
-            if condition['callback'](response) == False:
+            if condition['callback'](response) == True:
+                pass
+            else:
                 return False
         return True
 
