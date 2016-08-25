@@ -52,9 +52,9 @@ any of this boilerplate code ever again.
 A Real-World Example
 ++++++++++++++++++++
 
-For example: "Poll my endpoint until it responds with the JSON payload ``{'status': 'SUCCESS'}``
+"Poll my endpoint until it responds with the JSON payload ``{'status': 'SUCCESS'}``
 and a HTTP status code 200, but raise an alarm if the HTTP status code is 500 or if the
-JSON payload is ``{'status': 'TIMEOUT'}``. Ignore any ``ConnectionException`` s, and
+JSON payload is ``{'status': 'TIMEOUT'}``. If a ``ConnectionError`` is thrown, ignore it, and
 give up after 20 attempts."
 
 .. code-block:: python
@@ -65,7 +65,7 @@ give up after 20 attempts."
                               'status_code': 200},
                        alarms=[{'status_code': 500},
                                {'json': {'status': 'TIMEOUT'}}],
-                       ignore_exceptions=[ConnectionException],
+                       ignore_exceptions=[ConnectionError],
                        max_retries=20)
    except Alarm as e:
        if e.response.status_code == 500:
