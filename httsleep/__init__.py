@@ -1,1 +1,1 @@
-from .main import httsleep
+from .main import httsleep, HttSleeper

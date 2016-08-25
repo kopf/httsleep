@@ -6,7 +6,7 @@ import mock
 import pytest
 from requests.exceptions import ConnectionError
 
-from httsleep.main import HttSleep, Alarm, DEFAULT_POLLING_INTERVAL
+from httsleep.main import HttSleeper, Alarm, DEFAULT_POLLING_INTERVAL
 
 URL = 'http://example.com'
 
@@ -16,7 +16,7 @@ def test_run_success():
     """Should return response when a success criteria has been reached"""
     httpretty.register_uri(httpretty.GET, URL, body='<html></html>', status=200)
     with mock.patch('httsleep.main.sleep') as mock_sleep:
-        httsleep = HttSleep(URL, {'status_code': 200})
+        httsleep = HttSleeper(URL, {'status_code': 200})
         resp = httsleep.run()
         assert resp.status_code == 200
         assert not mock_sleep.called
@@ -24,9 +24,9 @@ def test_run_success():
 
 @httpretty.activate
 def test_run_alarm():
-    """Should raise an HttSleepAlarm when a failure criteria has been reached"""
+    """Should raise an Alarm when a failure criteria has been reached"""
     httpretty.register_uri(httpretty.GET, URL, body='<html></html>', status=400)
-    httsleep = HttSleep(URL, {'status_code': 200}, alarms={'status_code': 400})
+    httsleep = HttSleeper(URL, {'status_code': 200}, alarms={'status_code': 400})
     with pytest.raises(Alarm):
         httsleep.run()
 
@@ -35,7 +35,7 @@ def test_run_alarm():
 def test_run_success_alarm():
     """Make sure failure criteria takes precedence over success criteria (if httsleep is being used incorrectly)"""
     httpretty.register_uri(httpretty.GET, URL, body='', status=200)
-    httsleep = HttSleep(URL, {'status_code': 200}, alarms={'text': ''})
+    httsleep = HttSleeper(URL, {'status_code': 200}, alarms={'text': ''})
     with pytest.raises(Alarm):
         httsleep.run()
 
@@ -48,7 +48,7 @@ def test_run_retries():
                  httpretty.Response(body="<html></html>", status=200)]
     httpretty.register_uri(httpretty.GET, URL, responses=responses)
     with mock.patch('httsleep.main.sleep') as mock_sleep:
-        resp = HttSleep(URL, {'status_code': 200}).run()
+        resp = HttSleeper(URL, {'status_code': 200}).run()
         assert mock_sleep.called
         assert mock_sleep.call_count == 2
     assert resp.status_code == 200
@@ -61,7 +61,7 @@ def test_run_sleep_default_interval():
                  httpretty.Response(body="<html></html>", status=200)]
     httpretty.register_uri(httpretty.GET, URL, responses=responses)
     with mock.patch('httsleep.main.sleep') as mock_sleep:
-        resp = HttSleep(URL, {'status_code': 200}).run()
+        resp = HttSleeper(URL, {'status_code': 200}).run()
         assert mock_sleep.called_once_with(DEFAULT_POLLING_INTERVAL)
 
 
@@ -71,7 +71,7 @@ def test_run_sleep_custom_interval():
                  httpretty.Response(body="<html></html>", status=200)]
     httpretty.register_uri(httpretty.GET, URL, responses=responses)
     with mock.patch('httsleep.main.sleep') as mock_sleep:
-        resp = HttSleep(URL, {'status_code': 200}, polling_interval=6).run()
+        resp = HttSleeper(URL, {'status_code': 200}, polling_interval=6).run()
         assert mock_sleep.called_once_with(6)
 
 
@@ -83,7 +83,7 @@ def test_run_max_retries():
                  httpretty.Response(body="Internal Server Error", status=500)]
     httpretty.register_uri(httpretty.GET, URL, responses=responses)
     with mock.patch('httsleep.main.sleep'):
-        httsleep = HttSleep(URL, {'status_code': 200}, max_retries=2)
+        httsleep = HttSleeper(URL, {'status_code': 200}, max_retries=2)
         with pytest.raises(StopIteration):
             httsleep.run()
 
@@ -94,7 +94,7 @@ def test_ignore_exceptions():
                  httpretty.Response(body="{}", status=200)]
     httpretty.register_uri(httpretty.GET, URL, responses=responses)
     with mock.patch('httsleep.main.sleep'):
-        httsleep = HttSleep(URL, {'json': {}}, ignore_exceptions=[ConnectionError])
+        httsleep = HttSleeper(URL, {'json': {}}, ignore_exceptions=[ConnectionError])
         resp = httsleep.run()
     assert resp.status_code == 200
     assert resp.text == "{}"
@@ -107,7 +107,7 @@ def test_json_condition():
                  httpretty.Response(body=json.dumps(expected), status=200)]
     httpretty.register_uri(httpretty.GET, URL, responses=responses)
     with mock.patch('httsleep.main.sleep'):
-        httsleep = HttSleep(URL, {'json': expected})
+        httsleep = HttSleeper(URL, {'json': expected})
         resp = httsleep.run()
     assert resp.status_code == 200
     assert resp.json() == expected
@@ -120,7 +120,7 @@ def test_text_condition():
                  httpretty.Response(body=expected, status=200)]
     httpretty.register_uri(httpretty.GET, URL, responses=responses)
     with mock.patch('httsleep.main.sleep'):
-        httsleep = HttSleep(URL, {'text': expected})
+        httsleep = HttSleeper(URL, {'text': expected})
         resp = httsleep.run()
     assert resp.status_code == 200
     assert resp.text == expected
@@ -132,7 +132,7 @@ def test_jsonpath_condition():
     responses = [httpretty.Response(body=json.dumps(payload), status=200)]
     httpretty.register_uri(httpretty.GET, URL, responses=responses)
     with mock.patch('httsleep.main.sleep'):
-        httsleep = HttSleep(URL, {'jsonpath': [{'expression': 'status', 'value': 'SUCCESS'}]})
+        httsleep = HttSleeper(URL, {'jsonpath': [{'expression': 'status', 'value': 'SUCCESS'}]})
         resp = httsleep.run()
     assert resp.status_code == 200
     assert resp.json() == payload
@@ -145,7 +145,7 @@ def test_precompiled_jsonpath_expression():
     httpretty.register_uri(httpretty.GET, URL, responses=responses)
     expression = Fields('status')
     with mock.patch('httsleep.main.sleep'):
-        httsleep = HttSleep(URL, {'jsonpath': [{'expression': expression, 'value': 'SUCCESS'}]})
+        httsleep = HttSleeper(URL, {'jsonpath': [{'expression': expression, 'value': 'SUCCESS'}]})
         resp = httsleep.run()
     assert resp.status_code == 200
     assert resp.json() == payload
@@ -157,7 +157,7 @@ def test_jsonpath_condition_multiple_values():
     responses = [httpretty.Response(body=json.dumps(payload), status=200)]
     httpretty.register_uri(httpretty.GET, URL, responses=responses)
     with mock.patch('httsleep.main.sleep'):
-        httsleep = HttSleep(URL, {'jsonpath': [{'expression': 'foo[*].bar', 'value': [1, 2]}]})
+        httsleep = HttSleeper(URL, {'jsonpath': [{'expression': 'foo[*].bar', 'value': [1, 2]}]})
         resp = httsleep.run()
     assert resp.status_code == 200
     assert resp.json() == payload
@@ -169,7 +169,7 @@ def test_jsonpath_condition_multiple_values():
     responses = [httpretty.Response(body=json.dumps(payload), status=200)]
     httpretty.register_uri(httpretty.GET, URL, responses=responses)
     with mock.patch('httsleep.main.sleep'):
-        httsleep = HttSleep(URL, {'jsonpath': [{'expression': 'foo[*].bar', 'value': [1, 2]}]})
+        httsleep = HttSleeper(URL, {'jsonpath': [{'expression': 'foo[*].bar', 'value': [1, 2]}]})
         resp = httsleep.run()
     assert resp.status_code == 200
     assert resp.json() == payload
@@ -181,8 +181,8 @@ def test_multiple_jsonpath_conditions():
     responses = [httpretty.Response(body=json.dumps(payload), status=200)]
     httpretty.register_uri(httpretty.GET, URL, responses=responses)
     with mock.patch('httsleep.main.sleep'):
-        httsleep = HttSleep(URL, {'jsonpath': [{'expression': 'foo[0].bar', 'value': 1},
-                                               {'expression': 'foo[1].bar', 'value': 2}]})
+        httsleep = HttSleeper(URL, {'jsonpath': [{'expression': 'foo[0].bar', 'value': 1},
+                                                 {'expression': 'foo[1].bar', 'value': 2}]})
         resp = httsleep.run()
     assert resp.status_code == 200
     assert resp.json() == payload
@@ -199,7 +199,7 @@ def test_callback_condition():
                  httpretty.Response(body=text, status=200)]
     httpretty.register_uri(httpretty.GET, URL, responses=responses)
     with mock.patch('httsleep.main.sleep'):
-        resp = HttSleep(URL, {'callback': my_func}).run()
+        resp = HttSleeper(URL, {'callback': my_func}).run()
     assert resp.status_code == 200
     assert resp.text == text
 
@@ -213,7 +213,7 @@ def test_multiple_success_conditions():
     conditions = [{'text': 'third response', 'status_code': 200},
                   {'text': 'second response', 'status_code': 200}]
     with mock.patch('httsleep.main.sleep'):
-        httsleep = HttSleep(URL, conditions)
+        httsleep = HttSleeper(URL, conditions)
         resp = httsleep.run()
     assert resp.status_code == 200
     assert resp.text == 'second response'
@@ -229,7 +229,7 @@ def test_multiple_alarms():
     alarms = [{'text': 'Internal Server Error', 'status_code': 500},
               {'json': error_msg, 'status_code': 500}]
     with mock.patch('httsleep.main.sleep'):
-        httsleep = HttSleep(URL, {'status_code': 200}, alarms=alarms)
+        httsleep = HttSleeper(URL, {'status_code': 200}, alarms=alarms)
         try:
             httsleep.run()
         except Alarm as e:
