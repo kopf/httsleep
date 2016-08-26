@@ -1,6 +1,11 @@
 httsleep Changelog
 ==================
 
+Next release
+------------
+
+* Fix docstring
+
 Version 0.1.2
 -------------
 

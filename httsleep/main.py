@@ -30,7 +30,7 @@ class HttSleeper(object):
     :param text: shorthand for a success condition dependent on the response's
                  body payload.
     :param callback: shorthand for a success condition dependent on a callback
-                     function that takes the response as an argument not returning False.
+                     function that takes the response as an argument returning True.
     :param auth: a (username, password) tuple for HTTP authentication.
     :param headers: a dict of HTTP headers.
     :param polling_interval: how many seconds to sleep between requests.
