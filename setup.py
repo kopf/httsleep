@@ -10,7 +10,7 @@ def setup_package():
           description='A python library for polling HTTP endpoints - batteries included!',
           author='Aengus Walton',
           author_email='ventolin@gmail.com',
-          url='https://github.com/kopf',
+          url='https://github.com/kopf/httsleep',
           packages=find_packages(exclude=['tests', 'test']),
           classifiers=[
               'Development Status :: 4 - Beta',
