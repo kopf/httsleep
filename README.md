@@ -1,12 +1,14 @@
 # httsleep
 
-httsleep is a powerful polling library for Python.
-
 [![Build Status](https://travis-ci.org/kopf/httsleep.svg?branch=master)](https://travis-ci.org/kopf/httsleep)
 
 [![Coverage Status](https://coveralls.io/repos/github/kopf/httsleep/badge.svg?branch=master)](https://coveralls.io/github/kopf/httsleep?branch=master)
 
+httsleep is a powerful polling library for Python. 
+
 ## Idea
+
+Set your success conditions, set a few alarms, and get polling!
 
 ```
    until = {
@@ -20,8 +22,9 @@ httsleep is a powerful polling library for Python.
        'callback': is_job_really_failing},
        {'status_code': 404}
    ]
-   httsleep('http://myendpoint/jobs/1', until, alarms=alarms,
-            max_retries=20)
+   response = httsleep(
+       'http://myendpoint/jobs/1', until, alarms=alarms, 
+       max_retries=20)
 ```
 
 Translated into English, this means:
@@ -36,7 +39,7 @@ Translated into English, this means:
 
 ## Documentation 
 
-(TODO: Link here once doc is published)
+http://httsleep.readthedocs.io/
 
 ## Installing
 

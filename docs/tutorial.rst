@@ -51,7 +51,7 @@ break on a :class:`requests.exceptions.ConnectionError`, but instead keep pollin
 Conditionals
 ------------
 
-There are five conditionals built in to httsleep:
+There are five conditions built in to httsleep:
 
 * ``status_code``
 * ``text``
@@ -78,7 +78,7 @@ JSONPath
 .. _jsonpath-rw: http://jsonpath-rw.readthedocs.io/en/latest/
 .. _refer to its documentation: http://jsonpath-rw.readthedocs.io/en/latest/
 
-The ``json`` conditional is all well and good, but what if we're querying a
+The ``json`` condition is all well and good, but what if we're querying a
 resource on a RESTful API? The response may look something like the following:
 
 .. code-block:: json
@@ -124,9 +124,9 @@ please `refer to its documentation`_.
 Callbacks
 ~~~~~~~~~
 
-The last conditional to have a look at is ``callback``. This allows you to
+The last condition to have a look at is ``callback``. This allows you to
 use your own function to evaluate the response and is intended for very specific
-cases where the other conditionals might not be flexible enough.
+cases where the other conditions might not be flexible enough.
 
 A callback function should return ``True`` if the response matches. Any other
 return value will be interpreted as failure by httsleep, and it will keep polling.
@@ -151,13 +151,13 @@ is in the past.
 Multiple Conditionals
 ---------------------
 
-It's possible to use multiple conditionals simultaneously to assert many different things.
-Multiple conditionals are joined using a boolean "AND".
+It's possible to use multiple conditions simultaneously to assert many different things.
+Multiple conditions are joined using a boolean "AND".
 
 For example, the following httsleep call will poll until a response with status code ``200`` AND
 an empty dict in the JSON body are received:
 
-.. _multiple-conditional-codeblock:
+.. _multiple-condition-codeblock:
 .. code-block:: python
 
    httsleep('http://myendpoint/jobs/1', status_code=200, json={})
@@ -165,11 +165,11 @@ an empty dict in the JSON body are received:
 The ``until`` kwarg
 ~~~~~~~~~~~~~~~~~~~
 
-Until now, we've been specifying conditionals by using direct kwargs.
+Until now, we've been specifying conditions by using direct kwargs.
 This can be a convenient shorthand for simple cases, but it's a little restrictive.
 
 There is another way: using the ``until`` kwarg.
-To demonstrate, :ref:`the previous example <multiple-conditional-codeblock>` could be rewritten as:
+To demonstrate, :ref:`the previous example <multiple-condition-codeblock>` could be rewritten as:
 
 .. code-block:: python
 
@@ -177,8 +177,8 @@ To demonstrate, :ref:`the previous example <multiple-conditional-codeblock>` cou
             until={'status_code': 200, 'json': {}})
 
 One benefit of this is added readability -- the client *sleeps until* a certain
-response is received. Another is the ability to chain conditionals to form not
-just boolean ANDs, but also boolean ORs. More on that later in :ref:`Chaining Conditionals <chaining-conditionals>`.
+response is received. Another is the ability to chain conditions to form not
+just boolean ANDs, but also boolean ORs. More on that later in :ref:`Chaining Conditionals <chaining-conditions>`.
 
 Setting Alarms
 --------------
@@ -199,8 +199,8 @@ This is because no alarms have been set.
 Alarms can be set using the ``alarms`` kwarg, just like success conditions can be
 set using the ``until`` kwarg. Every time it polls an endpoint, httsleep always
 checks whether any alarms are set, and if so, evaluates them. If the response matches
-an alarm conditional, an :class:`httsleep.exceptions.Alarm` exception is raised. If not,
-httsleep goes on and checks the success conditionals.
+an alarm condition, an :class:`httsleep.exceptions.Alarm` exception is raised. If not,
+httsleep goes on and checks the success conditions.
 
 Here is a version of the example above, modified so that it raises an :class:`httsleep.exceptions.Alarm`
 if the job status is set to ``ERROR``:
@@ -219,14 +219,14 @@ if the job status is set to ``ERROR``:
 As can be seen here, the response object is stored in the exception, along with
 the alarm that was triggered.
 
-Any conditionals, or combination thereof, can be used to set alarms.
+Any conditions, or combination thereof, can be used to set alarms.
 
-.. _chaining-conditionals:
+.. _chaining-conditions:
 
 Chaining Conditionals and Alarms
 --------------------------------
 
-We've seen that conditionals can be joined together with a boolean "AND" by
+We've seen that conditions can be joined together with a boolean "AND" by
 packing them into a single dictionary.
 
 There are cases where we might want to join conditions using boolean "OR". In
