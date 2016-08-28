@@ -4,6 +4,9 @@ httsleep Changelog
 Next release
 ------------
 
+Version 0.1.3
+-------------
+
 * Fix docstring
 * Documentation cleanup
 * Replace markdown README with rst version
