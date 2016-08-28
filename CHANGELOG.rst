@@ -6,6 +6,7 @@ Next release
 
 * Fix docstring
 * Documentation cleanup
+* Replace markdown README with rst version
 
 Version 0.1.2
 -------------
