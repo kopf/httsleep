@@ -59,21 +59,13 @@ give up after 20 attempts."
 
 .. code-block:: python
 
-   try:
-       resp = httsleep('http://server/endpoint',
-                       until={'json': {'status': 'SUCCESS'},
-                              'status_code': 200},
-                       alarms=[{'status_code': 500},
-                               {'json': {'status': 'TIMEOUT'}}],
-                       ignore_exceptions=[ConnectionError],
-                       max_retries=20)
-   except Alarm as e:
-       if e.response.status_code == 500:
-           print "Internal Server Error! Giving up!"
-       else:
-           print "The job timed out!"
-   except StopIteration:
-       print "max retries was exceeded!"
+    resp = httsleep('http://server/endpoint',
+                    until={'json': {'status': 'SUCCESS'},
+                           'status_code': 200},
+                    alarms=[{'status_code': 500},
+                            {'json': {'status': 'TIMEOUT'}}],
+                    ignore_exceptions=[ConnectionError],
+                    max_retries=20)
 
 
 The Python code required to cover this logic would be significantly more complex,

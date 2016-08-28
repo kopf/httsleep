@@ -48,8 +48,8 @@ break on a :class:`requests.exceptions.ConnectionError`, but instead keep pollin
                        ignore_exceptions=[ConnectionError])
 
 
-Conditionals
-------------
+Conditions
+----------
 
 There are five conditions built in to httsleep:
 
@@ -71,6 +71,9 @@ status code is received. ``text`` and ``json`` are similar:
    httsleep('http://myendpoint/jobs/1', text="OK!")
    # Poll until the json-decoded response has a certain value:
    httsleep('http://myendpoint/jobs/1', json={'status': 'OK'})
+
+If a ``json`` condition is specified but no JSON object could be decoded, a ValueError
+bubbles up. If needs be, this can be ignored by specifying ``ignore_exceptions``.
 
 JSONPath
 ~~~~~~~~
@@ -271,7 +274,7 @@ We can see how far this can be taken in the next example:
        'callback': is_job_really_failing},
        {'status_code': 404}
    ]
-   httsleep('http://myendpoint/jobs/1', until, alarms=alarms,
+   httsleep('http://myendpoint/jobs/1', until=until, alarms=alarms,
             max_retries=20)
 
 

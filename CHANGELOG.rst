@@ -5,6 +5,7 @@ Next release
 ------------
 
 * Fix docstring
+* Documentation cleanup
 
 Version 0.1.2
 -------------
