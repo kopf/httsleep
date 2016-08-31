@@ -121,6 +121,8 @@ only one status code, and only one body, but multiple JSONPath expressions might
 evaluate true for the JSON content returned. Therefore, you can string multiple JSONPaths
 together in a list. Logically, they will be evaluated with a boolean AND.
 
+JSONPath is a highly powerful language, similar to XPath for XML. This section
+just skims the surface of what's possible with this language.
 To find out more about JSONPath and how to use it to build complex expressions,
 please `refer to its documentation`_.
 
