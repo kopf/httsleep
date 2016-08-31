@@ -3,6 +3,7 @@ httsleep Changelog
 
 Next release
 ------------
+* Documentation improvements
 
 Version 0.1.3
 -------------
