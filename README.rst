@@ -25,9 +25,13 @@ Set your success conditions, set a few alarms, and get polling!
            'callback': is_job_really_failing},
            {'status_code': 404}
        ]
-       response = httsleep(
-           'http://myendpoint/jobs/1', until, alarms=alarms, 
-           max_retries=20)
+       try:
+          response = httsleep(
+              'http://myendpoint/jobs/1', until, alarms=alarms,
+              max_retries=20)
+       except Alarm as e:
+           print "Response was:", e.response
+           print "Alarm condition that matched was:", e.alarm
 
 Translated into English, this means:
 
@@ -36,7 +40,7 @@ Translated into English, this means:
    -  it returns a status code of ``200``
    -  AND the ``status`` key in its response has the value ``OK``
 
--  but raise an error if
+-  but raise an alarm if
 
    -  the ``status`` key has the value ``ERROR``
    -  OR the ``status`` key has the value ``UNKNOWN`` AND the ``owner``
