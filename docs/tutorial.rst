@@ -27,15 +27,17 @@ We can change these defaults to poll once a minute, but a maximum of 10 times:
        print "Max retries has been exhausted!"
 
 Similar to the Requests library, we can also set the ``auth`` to a ``(username, password)``
-tuple and ``headers`` to a dict of headers if necessary.
-
-In order to poll with requests other than a GET request, a :class:`requests.Request` object
-must be passed in place of a URL:
+tuple and ``headers`` to a dict of headers if necessary. It is worth noting that these are provided as a
+convenience, since many APIs will require some form of authentication and client headers, and that
+httsleep doesn't duplicate the Requests library's API wholesale. Instead, you can
+pass a :class:`requests.Request` object in place of the URL in more specific cases
+(e.g. polling using a POST request):
 
 .. code-block:: python
 
    from requests import Request
-   req = Request('http://myendpoint/jobs/1', method='POST', data={})
+   req = Request('http://myendpoint/jobs/1', method='POST',
+                 data={'payload': 'here'})
    response = httsleep(req, status_code=200)
 
 If we're polling a server with a dodgy network connection, we might not want to
@@ -50,6 +52,9 @@ break on a :class:`requests.exceptions.ConnectionError`, but instead keep pollin
 
 Conditions
 ----------
+
+Let's move on to specifying conditions. These are the conditions which,
+when met, cause httsleep to stop polling.
 
 There are five conditions built in to httsleep:
 
