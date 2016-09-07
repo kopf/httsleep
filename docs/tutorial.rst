@@ -16,7 +16,7 @@ In this example, httsleep will fire a HTTP GET request at ``http://myendpoint/jo
 every 2 seconds, retrying a maximum of 50 times, until it gets a response with a
 status code of ``200``.
 
-We can change this to poll once a minute, but a maximum of 10 times:
+We can change these defaults to poll once a minute, but a maximum of 10 times:
 
 .. code-block:: python
 
