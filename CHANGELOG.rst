@@ -3,6 +3,9 @@ httsleep Changelog
 
 Next release
 ------------
+* ``httsleep`` is now an alias of the ``HttSleeper`` class.
+* Added the ``run`` kwarg which defaults to True. If True, ``self.run()``
+  is called automatically upon instantiation of a ``HttSleeper`` object.
 * Documentation improvements
 
 Version 0.1.3
