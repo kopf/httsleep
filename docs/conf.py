@@ -131,11 +131,7 @@ html_theme = 'sphinx_rtd_theme'
 # documentation.
 #
 html_theme_options = {
-    'show_powered_by': False,
-    'github_user': 'kopf',
-    'github_repo': 'httsleep',
-    'github_banner': True,
-    'show_related': False
+    'analytics_id': 'UA-83802881-1'
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
