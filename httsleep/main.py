@@ -188,12 +188,22 @@ class HttSleeper(object):
         return True
 
 
-def httsleep(*args, **kwargs):
+def httsleep(url_or_request, until=None, alarms=None,
+             status_code=None, json=None, jsonpath=None, text=None, callback=None,
+             auth=None, headers=None,
+             polling_interval=DEFAULT_POLLING_INTERVAL,
+             max_retries=DEFAULT_MAX_RETRIES,
+             ignore_exceptions=None,
+             loglevel=logging.ERROR):
     """ Convenience wrapper for the :class:`.HttSleeper` class.
     Creates a HttSleeper object and automatically runs it.
 
-    :param args: args used to instantiate the :class:`.HttSleeper` object.
-    :param kwargs: kwargs used to instantiate the :class:`.HttSleeper` object.
     :return: :class:`requests.Response` object.
     """
-    return HttSleeper(*args, **kwargs).run()
+    return HttSleeper(
+        url_or_request, until=until, alarms=alarms, status_code=status_code,
+        json=json, jsonpath=jsonpath, text=text, callback=callback,
+        auth=auth, headers=headers, polling_interval=polling_interval,
+        max_retries=max_retries, ignore_exceptions=ignore_exceptions,
+        loglevel=loglevel
+    ).run()

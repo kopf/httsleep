@@ -3,6 +3,8 @@ httsleep Changelog
 
 Next release
 ------------
+* Replace *args and **kwargs in httsleep wrapper with explicit args/kwargs, so
+  they can be displayed in IDEs
 * Documentation improvements
 
 Version 0.1.3
