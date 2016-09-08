@@ -39,7 +39,6 @@ class HttSleeper(object):
     :param ignore_exceptions: a list of exceptions to ignore when polling
                               the endpoint.
     :param loglevel: the loglevel to use. Defaults to `ERROR`.
-    :param run: begin polling automatically. Defaults to `True`.
 
     ``url_or_request`` must be provided, along with at least one of ``until``,
     ``status_code``, ``json``, ``jsonpath``, ``text`` or ``callback``.
@@ -51,8 +50,7 @@ class HttSleeper(object):
                  polling_interval=DEFAULT_POLLING_INTERVAL,
                  max_retries=DEFAULT_MAX_RETRIES,
                  ignore_exceptions=None,
-                 loglevel=logging.ERROR,
-                 run=True):
+                 loglevel=logging.ERROR):
         if isinstance(url_or_request, string_types):
             self.request = requests.Request(
                 method='GET', url=url_or_request, auth=auth, headers=headers)
@@ -88,8 +86,6 @@ class HttSleeper(object):
         self.session = requests.Session()
         self.log = logging.getLogger()
         self.log.setLevel(loglevel)
-        if run:
-            self.run()
 
     def _set_conditions(self, attribute, conditions):
         value = []
@@ -134,12 +130,12 @@ class HttSleeper(object):
         """
         Polls the endpoint until either:
 
+        * a success condition in ``self.until`` is reached, in which case a
+          :class:`requests.Request` object is returned
+        * an error condition in ``self.alarms`` is encountered, in which case an
+          :class:`Alarm` exception is raised
         * ``self.max_retries`` is reached, in which case a :class:`StopIteration` exception
           is raised
-        * or an error condition in ``self.alarms`` is encountered, in which case an
-          :class:`Alarm` exception is raised
-        * or a success condition in ``self.until`` is reached, in which case a
-          :class:`requests.Request` object is returned
 
         :return: :class:`requests.Response` object.
         """
@@ -192,4 +188,12 @@ class HttSleeper(object):
         return True
 
 
-httsleep = HttSleeper
+def httsleep(*args, **kwargs):
+    """ Convenience wrapper for the :class:`.HttSleeper` class.
+    Creates a HttSleeper object and automatically runs it.
+
+    :param args: args used to instantiate the :class:`.HttSleeper` object.
+    :param kwargs: kwargs used to instantiate the :class:`.HttSleeper` object.
+    :return: :class:`requests.Response` object.
+    """
+    return HttSleeper(*args, **kwargs).run()
