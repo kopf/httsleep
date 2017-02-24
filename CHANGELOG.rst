@@ -1,6 +1,11 @@
 httsleep Changelog
 ==================
 
+Version 0.2.0
+-------------
+* The shorthand kwargs (``status_code``, ``json``, ``jsonpath``, ``text``, ``callback``)
+  are now deprecated. Please use ``until`` exclusively.
+
 Version 0.1.4
 -------------
 * Replace ``*args`` and ``**kwargs`` in httsleep wrapper with explicit args/kwargs, so
