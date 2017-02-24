@@ -177,6 +177,7 @@ The ``until`` kwarg
 
 Until now, we've been specifying conditions by using direct kwargs.
 This can be a convenient shorthand for simple cases, but it's a little restrictive.
+It is also deprecated and will be removed in a future release.
 
 There is another way: using the ``until`` kwarg.
 To demonstrate, :ref:`the previous example <multiple-condition-codeblock>` could be rewritten as:
