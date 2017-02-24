@@ -1,5 +1,6 @@
 import logging
 from time import sleep
+import warnings
 
 import jsonpath_rw
 import requests
@@ -21,13 +22,13 @@ class HttSleeper(object):
                   single success condition dict.
     :param alarms: a list of error conditions, respresented by dicts, or a
                    single error condition dict.
-    :param status_code: shorthand for a success condition dependent on the
+    :param status_code: deprecated. Shorthand for a success condition dependent on the
                         response's status code.
-    :param json: shorthand for a success condition dependent on the response's
+    :param json: Deprecated. Shorthand for a success condition dependent on the response's
                  JSON payload.
-    :param jsonpath: shorthand for a success condition dependent on the evaluation
+    :param jsonpath: Deprecated. Shorthand for a success condition dependent on the evaluation
                      of a JSONPath expression.
-    :param text: shorthand for a success condition dependent on the response's
+    :param text: Deprecated. Shorthand for a success condition dependent on the response's
                  body payload.
     :param callback: shorthand for a success condition dependent on a callback
                      function that takes the response as an argument returning True.
@@ -40,8 +41,7 @@ class HttSleeper(object):
                               the endpoint.
     :param loglevel: the loglevel to use. Defaults to `ERROR`.
 
-    ``url_or_request`` must be provided, along with at least one of ``until``,
-    ``status_code``, ``json``, ``jsonpath``, ``text`` or ``callback``.
+    ``url_or_request`` must be provided, along with at least one success condition (``until``).
 
     """
     def __init__(self, url_or_request, until=None, alarms=None,
@@ -51,6 +51,10 @@ class HttSleeper(object):
                  max_retries=DEFAULT_MAX_RETRIES,
                  ignore_exceptions=None,
                  loglevel=logging.ERROR):
+        if status_code or json or jsonpath or text or callback:
+            msg = ("The shorthand kwargs status_code, json, jsonpath, text"
+                   " and callback are deprecated and will soon be removed.")
+            warnings.warn(msg, DeprecationWarning)
         if isinstance(url_or_request, string_types):
             self.request = requests.Request(
                 method='GET', url=url_or_request, auth=auth, headers=headers)
