@@ -11,9 +11,11 @@ def setup_package():
           author='Aengus Walton',
           author_email='ventolin@gmail.com',
           url='https://github.com/kopf/httsleep',
+          license='Apache',
           packages=find_packages(exclude=['tests', 'test']),
           classifiers=[
               'Development Status :: 4 - Beta',
+              'License :: OSI Approved :: Apache Software License',
               'Programming Language :: Python',
               'Programming Language :: Python :: 2.7',
               'Programming Language :: Python :: 3.4',
