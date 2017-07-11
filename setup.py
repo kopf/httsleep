@@ -8,6 +8,7 @@ from setuptools import setup, find_packages
 def setup_package():
     setup(name='httsleep',
           description='A python library for polling HTTP endpoints - batteries included!',
+          long_description=open('README.rst').read(),
           author='Aengus Walton',
           author_email='ventolin@gmail.com',
           url='https://github.com/kopf/httsleep',
