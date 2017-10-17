@@ -34,6 +34,9 @@ class HttSleeper(object):
                      function that takes the response as an argument returning True.
     :param auth: a (username, password) tuple for HTTP authentication.
     :param headers: a dict of HTTP headers.
+    :param verify: (optional) Either a boolean, in which case it controls whether we verify
+                   the server's TLS certificate, or a string, in which case it must be a path
+                   to a CA bundle to use. Defaults to ``True``.
     :param polling_interval: how many seconds to sleep between requests.
     :param max_retries: the maximum number of retries to make, after which
                         a StopIteration exception is raised.
@@ -46,7 +49,7 @@ class HttSleeper(object):
     """
     def __init__(self, url_or_request, until=None, alarms=None,
                  status_code=None, json=None, jsonpath=None, text=None, callback=None,
-                 auth=None, headers=None,
+                 auth=None, headers=None, verify=None,
                  polling_interval=DEFAULT_POLLING_INTERVAL,
                  max_retries=DEFAULT_MAX_RETRIES,
                  ignore_exceptions=None,
@@ -84,6 +87,7 @@ class HttSleeper(object):
                          'jsonpath': jsonpath, 'text': text, 'callback': callback}
             until.append({k: v for k, v in condition.items() if v})
 
+        self.verify = verify
         self.until = until
         self.alarms = alarms
         self.polling_interval = int(polling_interval)
@@ -145,7 +149,7 @@ class HttSleeper(object):
         """
         while True:
             try:
-                response = self.session.send(self.request.prepare())
+                response = self.session.send(self.request.prepare(), verify=self.verify)
                 for condition in self.alarms:
                     if self.meets_condition(response, condition):
                         raise Alarm(response, condition)
@@ -192,9 +196,9 @@ class HttSleeper(object):
         return True
 
 
-def httsleep(url_or_request, until=None, alarms=None,
-             status_code=None, json=None, jsonpath=None, text=None, callback=None,
-             auth=None, headers=None,
+def httsleep(url_or_request, until=None, alarms=None, status_code=None,
+             json=None, jsonpath=None, text=None, callback=None,
+             auth=None, headers=None, verify=None,
              polling_interval=DEFAULT_POLLING_INTERVAL,
              max_retries=DEFAULT_MAX_RETRIES,
              ignore_exceptions=None,
@@ -207,7 +211,9 @@ def httsleep(url_or_request, until=None, alarms=None,
     return HttSleeper(
         url_or_request, until=until, alarms=alarms, status_code=status_code,
         json=json, jsonpath=jsonpath, text=text, callback=callback,
-        auth=auth, headers=headers, polling_interval=polling_interval,
-        max_retries=max_retries, ignore_exceptions=ignore_exceptions,
+        auth=auth, headers=headers, verify=verify,
+        polling_interval=polling_interval,
+        max_retries=max_retries,
+        ignore_exceptions=ignore_exceptions,
         loglevel=loglevel
     ).run()

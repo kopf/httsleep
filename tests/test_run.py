@@ -23,6 +23,17 @@ def test_run_success():
 
 
 @httpretty.activate
+def test_run_success_with_verify():
+    """Should return response when a success criteria has been reached"""
+    httpretty.register_uri(httpretty.GET, URL, body='<html></html>', status=200)
+    with mock.patch('httsleep.main.sleep') as mock_sleep:
+        httsleep = HttSleeper(URL, {'status_code': 200}, verify=False)
+        resp = httsleep.run()
+        assert resp.status_code == 200
+        assert not mock_sleep.called
+
+
+@httpretty.activate
 def test_run_alarm():
     """Should raise an Alarm when a failure criteria has been reached"""
     httpretty.register_uri(httpretty.GET, URL, body='<html></html>', status=400)
