@@ -5,6 +5,7 @@ from jsonpath_rw.jsonpath import Fields
 import mock
 import pytest
 from requests.exceptions import ConnectionError
+from requests import Response
 
 from httsleep.main import HttSleeper, Alarm, DEFAULT_POLLING_INTERVAL
 
@@ -23,14 +24,31 @@ def test_run_success():
 
 
 @httpretty.activate
-def test_run_success_with_verify():
-    """Should return response when a success criteria has been reached"""
-    httpretty.register_uri(httpretty.GET, URL, body='<html></html>', status=200)
-    with mock.patch('httsleep.main.sleep') as mock_sleep:
+def test_propagate_verify():
+    """Should tell requests to skip SSL verification if verify==False"""
+    with mock.patch('requests.sessions.Session.send') as mock_session_send:
+        okResp = Response()
+        okResp.status_code = 200
+        mock_session_send.return_value = okResp
         httsleep = HttSleeper(URL, {'status_code': 200}, verify=False)
-        resp = httsleep.run()
-        assert resp.status_code == 200
-        assert not mock_sleep.called
+        httsleep.run()
+        assert mock_session_send.called
+        args, kwargs = mock_session_send.call_args
+        assert kwargs.get('verify') is False
+
+
+@httpretty.activate
+def test_default_does_not_send_verify():
+    """Should not send a value for 'verify' to requests by default"""
+    with mock.patch('requests.sessions.Session.send') as mock_session_send:
+        okResp = Response()
+        okResp.status_code = 200
+        mock_session_send.return_value = okResp
+        httsleep = HttSleeper(URL, {'status_code': 200})
+        httsleep.run()
+        assert mock_session_send.called
+        args, kwargs = mock_session_send.call_args
+        assert kwargs.get('verify') is None
 
 
 @httpretty.activate
