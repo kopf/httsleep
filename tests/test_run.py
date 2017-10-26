@@ -26,29 +26,30 @@ def test_run_success():
 @httpretty.activate
 def test_propagate_verify():
     """Should tell requests to skip SSL verification if verify==False"""
+    resp = Response()
+    resp.status_code = 200
+    httsleep = HttSleeper(URL, {'status_code': 200}, verify=False)
     with mock.patch('requests.sessions.Session.send') as mock_session_send:
-        okResp = Response()
-        okResp.status_code = 200
-        mock_session_send.return_value = okResp
-        httsleep = HttSleeper(URL, {'status_code': 200}, verify=False)
+        mock_session_send.return_value = resp
         httsleep.run()
         assert mock_session_send.called
         args, kwargs = mock_session_send.call_args
-        assert kwargs.get('verify') is False
+    assert 'verify' in kwargs
+    assert kwargs['verify'] == False
 
 
 @httpretty.activate
 def test_default_does_not_send_verify():
     """Should not send a value for 'verify' to requests by default"""
+    resp = Response()
+    resp.status_code = 200
+    httsleep = HttSleeper(URL, {'status_code': 200})
     with mock.patch('requests.sessions.Session.send') as mock_session_send:
-        okResp = Response()
-        okResp.status_code = 200
-        mock_session_send.return_value = okResp
-        httsleep = HttSleeper(URL, {'status_code': 200})
+        mock_session_send.return_value = resp
         httsleep.run()
         assert mock_session_send.called
         args, kwargs = mock_session_send.call_args
-        assert kwargs.get('verify') is None
+    assert 'verify' not in kwargs
 
 
 @httpretty.activate
