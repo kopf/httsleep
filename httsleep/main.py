@@ -87,7 +87,9 @@ class HttSleeper(object):
                          'jsonpath': jsonpath, 'text': text, 'callback': callback}
             until.append({k: v for k, v in condition.items() if v})
 
-        self.verify = verify
+        self.kwargs = {}
+        if verify is not None:
+            self.kwargs['verify'] = verify
         self.until = until
         self.alarms = alarms
         self.polling_interval = int(polling_interval)
@@ -149,7 +151,7 @@ class HttSleeper(object):
         """
         while True:
             try:
-                response = self.session.send(self.request.prepare(), verify=self.verify)
+                response = self.session.send(self.request.prepare(), **self.kwargs)
                 for condition in self.alarms:
                     if self.meets_condition(response, condition):
                         raise Alarm(response, condition)
