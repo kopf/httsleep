@@ -35,14 +35,14 @@ def test_headers():
     assert obj.request.headers == headers
 
 
-def test_default_kwargs():
+def test_default_verify():
     obj = HttSleeper(URL, CONDITION)
-    assert obj.kwargs == {'verify': True}
+    assert obj.verify == True
 
 
 def test_verify():
     obj = HttSleeper(URL, CONDITION, verify=False)
-    assert obj.kwargs == {'verify': False}
+    assert obj.verify == False
 
 
 def test_ignore_exceptions_default_value():
