@@ -34,9 +34,9 @@ class HttSleeper(object):
                      function that takes the response as an argument returning True.
     :param auth: a (username, password) tuple for HTTP authentication.
     :param headers: a dict of HTTP headers.
-    :param verify: (optional) Either a boolean, in which case it controls whether we verify
-                   the server's TLS certificate, or a string, in which case it must be a path
-                   to a CA bundle to use. Defaults to ``True``.
+    :param verify: Either a boolean, in which case it controls whether we verify the server's
+                   TLS certificate, or a string, in which case it must be a path to a CA
+                   bundle to use. Defaults to ``True``.
     :param polling_interval: how many seconds to sleep between requests.
     :param max_retries: the maximum number of retries to make, after which
                         a StopIteration exception is raised.
