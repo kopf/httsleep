@@ -49,7 +49,7 @@ class HttSleeper(object):
     """
     def __init__(self, url_or_request, until=None, alarms=None,
                  status_code=None, json=None, jsonpath=None, text=None, callback=None,
-                 auth=None, headers=None, verify=None,
+                 auth=None, headers=None, verify=True,
                  polling_interval=DEFAULT_POLLING_INTERVAL,
                  max_retries=DEFAULT_MAX_RETRIES,
                  ignore_exceptions=None,

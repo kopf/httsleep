@@ -37,7 +37,7 @@ def test_headers():
 
 def test_default_kwargs():
     obj = HttSleeper(URL, CONDITION)
-    assert obj.kwargs == {}
+    assert obj.kwargs == {'verify': True}
 
 
 def test_verify():

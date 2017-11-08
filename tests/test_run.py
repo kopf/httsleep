@@ -39,7 +39,7 @@ def test_propagate_verify():
 
 
 @httpretty.activate
-def test_default_does_not_send_verify():
+def test_default_sends_verify_true():
     """Should not send a value for 'verify' to requests by default"""
     resp = Response()
     resp.status_code = 200
@@ -49,7 +49,8 @@ def test_default_does_not_send_verify():
         httsleep.run()
         assert mock_session_send.called
         args, kwargs = mock_session_send.call_args
-    assert 'verify' not in kwargs
+    assert 'verify' in kwargs
+    assert kwargs['verify'] == True
 
 
 @httpretty.activate
