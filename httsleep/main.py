@@ -40,7 +40,8 @@ class HttSleeper(object):
                     configuration (e.g. headers).
     :param verify: Either a boolean, in which case it controls whether we verify the server's
                    TLS certificate, or a string, in which case it must be a path to a CA
-                   bundle to use. Defaults to ``True``.
+                   bundle to use. If specified, this takes precedence over any value defined
+                   in the session (which itself would be ``True``, by default).
     :param polling_interval: how many seconds to sleep between requests.
     :param max_retries: the maximum number of retries to make, after which
                         a StopIteration exception is raised.
@@ -53,7 +54,7 @@ class HttSleeper(object):
     """
     def __init__(self, url_or_request, until=None, alarms=None,
                  status_code=None, json=None, jsonpath=None, text=None, callback=None,
-                 auth=None, headers=None, session=DEFAULT_SESSION, verify=True,
+                 auth=None, headers=None, session=DEFAULT_SESSION, verify=None,
                  polling_interval=DEFAULT_POLLING_INTERVAL,
                  max_retries=DEFAULT_MAX_RETRIES,
                  ignore_exceptions=None,
@@ -91,7 +92,9 @@ class HttSleeper(object):
                          'jsonpath': jsonpath, 'text': text, 'callback': callback}
             until.append({k: v for k, v in condition.items() if v})
 
-        self.verify = verify
+        self.kwargs = {}
+        if verify is not None:
+            self.kwargs['verify'] = verify
         self.until = until
         self.alarms = alarms
         self.polling_interval = int(polling_interval)
@@ -153,7 +156,7 @@ class HttSleeper(object):
         """
         while True:
             try:
-                response = self.session.send(self.session.prepare_request(self.request), verify=self.verify)
+                response = self.session.send(self.session.prepare_request(self.request), **self.kwargs)
                 for condition in self.alarms:
                     if self.meets_condition(response, condition):
                         raise Alarm(response, condition)
@@ -202,7 +205,7 @@ class HttSleeper(object):
 
 def httsleep(url_or_request, until=None, alarms=None, status_code=None,
              json=None, jsonpath=None, text=None, callback=None,
-             auth=None, headers=None, session=DEFAULT_SESSION, verify=True,
+             auth=None, headers=None, session=DEFAULT_SESSION, verify=None,
              polling_interval=DEFAULT_POLLING_INTERVAL,
              max_retries=DEFAULT_MAX_RETRIES,
              ignore_exceptions=None,
