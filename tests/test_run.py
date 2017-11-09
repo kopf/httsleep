@@ -4,6 +4,7 @@ import httpretty
 from jsonpath_rw.jsonpath import Fields
 import mock
 import pytest
+import requests
 from requests.exceptions import ConnectionError
 from requests import Response
 
@@ -51,6 +52,76 @@ def test_default_sends_verify_true():
         args, kwargs = mock_session_send.call_args
     assert 'verify' in kwargs
     assert kwargs['verify'] == True
+
+
+@httpretty.activate
+def test_default_uses_default_session():
+    """Should use a default Session object unless one is specified"""
+    resp = Response()
+    resp.status_code = 200
+    httsleep = HttSleeper(URL, {'status_code': 200})
+    with mock.patch('requests.sessions.Session.send') as mock_session_send:
+        mock_session_send.return_value = resp
+        httsleep.run()
+        assert mock_session_send.called
+        args, kwargs = mock_session_send.call_args
+    assert args[0].headers == requests.utils.default_headers()
+    assert 'verify' in kwargs
+    assert kwargs['verify'] == True
+
+
+@httpretty.activate
+def test_propagate_session():
+    """Should propagate a Session's headers, verify setting, cookies etc. when specified"""
+    session = requests.Session()
+    session.cookies = {'tasty-cookie': 'chocolate'}
+    session.headers = {'Content-Type': 'test/type'}
+    session.verify = '/session/verify'
+    resp = Response()
+    resp.status_code = 200
+    httsleep = HttSleeper(URL, {'status_code': 200}, session=session)
+    with mock.patch('requests.sessions.Session.send') as mock_session_send:
+        mock_session_send.return_value = resp
+        httsleep.run()
+        assert mock_session_send.called
+        args, kwargs = mock_session_send.call_args
+    assert args[0].headers == {'Content-Type': 'test/type', 'Cookie': 'tasty-cookie=chocolate'}
+    assert 'verify' in kwargs
+    assert kwargs['verify'] == '/session/verify'
+
+
+@httpretty.activate
+def test_session_headers_and_request_headers_combine():
+    """Should merge headers directly specified over any headers in a specified Session"""
+    session = requests.Session()
+    session.headers = {'session-header': 'mySession', 'conflict-header': 'session-loses'}
+    resp = Response()
+    resp.status_code = 200
+    httsleep = HttSleeper(URL, {'status_code': 200}, session=session,
+                          headers={'req-header': 'myRequest', 'conflict-header': 'req-wins'})
+    with mock.patch('requests.sessions.Session.send') as mock_session_send:
+        mock_session_send.return_value = resp
+        httsleep.run()
+        assert mock_session_send.called
+        args, kwargs = mock_session_send.call_args
+    assert args[0].headers == {'conflict-header': 'req-wins', 'req-header': 'myRequest', 'session-header': 'mySession'}
+
+
+@httpretty.activate
+def test_request_verify_overrules_session_verify():
+    """Should give precedence to the 'verify' setting in the request, over that in a specified Session"""
+    session = requests.Session()
+    session.verify = '/path/to/ca/bundle'
+    resp = Response()
+    resp.status_code = 200
+    httsleep = HttSleeper(URL, {'status_code': 200}, session=session, verify='/override/path')
+    with mock.patch('requests.sessions.Session.send') as mock_session_send:
+        mock_session_send.return_value = resp
+        httsleep.run()
+        assert mock_session_send.called
+        args, kwargs = mock_session_send.call_args
+    assert 'verify' in kwargs
+    assert kwargs['verify'] == '/override/path'
 
 
 @httpretty.activate

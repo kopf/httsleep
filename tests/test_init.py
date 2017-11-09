@@ -45,6 +45,21 @@ def test_verify():
     assert obj.verify == False
 
 
+def test_default_session():
+    obj = HttSleeper(URL, CONDITION)
+    assert obj.session.headers == requests.utils.default_headers()
+    assert obj.verify
+
+
+def test_session():
+    session = requests.Session()
+    session.headers = {'Content-Type': 'test/type'}
+    session.verify = False
+    obj = HttSleeper(URL, CONDITION, session=session)
+    assert obj.session.headers == session.headers
+    assert obj.session.verify == session.verify
+
+
 def test_ignore_exceptions_default_value():
     obj = HttSleeper(URL, CONDITION)
     assert obj.ignore_exceptions == tuple()
