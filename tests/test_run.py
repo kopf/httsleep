@@ -5,6 +5,7 @@ from jsonpath_rw.jsonpath import Fields
 import mock
 import pytest
 from requests.exceptions import ConnectionError
+from requests import Response
 
 from httsleep.main import HttSleeper, Alarm, DEFAULT_POLLING_INTERVAL
 
@@ -20,6 +21,36 @@ def test_run_success():
         resp = httsleep.run()
         assert resp.status_code == 200
         assert not mock_sleep.called
+
+
+@httpretty.activate
+def test_propagate_verify():
+    """Should tell requests to skip SSL verification if verify==False"""
+    resp = Response()
+    resp.status_code = 200
+    httsleep = HttSleeper(URL, {'status_code': 200}, verify=False)
+    with mock.patch('requests.sessions.Session.send') as mock_session_send:
+        mock_session_send.return_value = resp
+        httsleep.run()
+        assert mock_session_send.called
+        args, kwargs = mock_session_send.call_args
+    assert 'verify' in kwargs
+    assert kwargs['verify'] == False
+
+
+@httpretty.activate
+def test_default_sends_verify_true():
+    """Should not send a value for 'verify' to requests by default"""
+    resp = Response()
+    resp.status_code = 200
+    httsleep = HttSleeper(URL, {'status_code': 200})
+    with mock.patch('requests.sessions.Session.send') as mock_session_send:
+        mock_session_send.return_value = resp
+        httsleep.run()
+        assert mock_session_send.called
+        args, kwargs = mock_session_send.call_args
+    assert 'verify' in kwargs
+    assert kwargs['verify'] == True
 
 
 @httpretty.activate
