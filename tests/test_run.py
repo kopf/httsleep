@@ -30,11 +30,11 @@ def test_propagate_verify():
     resp = Response()
     resp.status_code = 200
     httsleep = HttSleeper(URL, {'status_code': 200}, verify=False)
-    with mock.patch('requests.sessions.Session.send') as mock_session_send:
-        mock_session_send.return_value = resp
+    with mock.patch('requests.adapters.HTTPAdapter.send') as mock_adapter_send:
+        mock_adapter_send.return_value = resp
         httsleep.run()
-        assert mock_session_send.called
-        args, kwargs = mock_session_send.call_args
+        assert mock_adapter_send.called
+        args, kwargs = mock_adapter_send.call_args
     assert 'verify' in kwargs
     assert kwargs['verify'] == False
 
@@ -45,11 +45,11 @@ def test_default_sends_verify_true():
     resp = Response()
     resp.status_code = 200
     httsleep = HttSleeper(URL, {'status_code': 200})
-    with mock.patch('requests.sessions.Session.send') as mock_session_send:
-        mock_session_send.return_value = resp
+    with mock.patch('requests.adapters.HTTPAdapter.send') as mock_adapter_send:
+        mock_adapter_send.return_value = resp
         httsleep.run()
-        assert mock_session_send.called
-        args, kwargs = mock_session_send.call_args
+        assert mock_adapter_send.called
+        args, kwargs = mock_adapter_send.call_args
     assert 'verify' in kwargs
     assert kwargs['verify'] == True
 
@@ -60,11 +60,11 @@ def test_default_uses_default_session():
     resp = Response()
     resp.status_code = 200
     httsleep = HttSleeper(URL, {'status_code': 200})
-    with mock.patch('requests.sessions.Session.send') as mock_session_send:
-        mock_session_send.return_value = resp
+    with mock.patch('requests.adapters.HTTPAdapter.send') as mock_adapter_send:
+        mock_adapter_send.return_value = resp
         httsleep.run()
-        assert mock_session_send.called
-        args, kwargs = mock_session_send.call_args
+        assert mock_adapter_send.called
+        args, kwargs = mock_adapter_send.call_args
     assert args[0].headers == requests.utils.default_headers()
     assert 'verify' in kwargs
     assert kwargs['verify'] == True
@@ -80,11 +80,11 @@ def test_propagate_session():
     resp = Response()
     resp.status_code = 200
     httsleep = HttSleeper(URL, {'status_code': 200}, session=session)
-    with mock.patch('requests.sessions.Session.send') as mock_session_send:
-        mock_session_send.return_value = resp
+    with mock.patch('requests.adapters.HTTPAdapter.send') as mock_adapter_send:
+        mock_adapter_send.return_value = resp
         httsleep.run()
-        assert mock_session_send.called
-        args, kwargs = mock_session_send.call_args
+        assert mock_adapter_send.called
+        args, kwargs = mock_adapter_send.call_args
     assert args[0].headers == {'Content-Type': 'test/type', 'Cookie': 'tasty-cookie=chocolate'}
     assert 'verify' in kwargs
     assert kwargs['verify'] == '/session/verify'
@@ -99,11 +99,11 @@ def test_session_headers_and_request_headers_combine():
     resp.status_code = 200
     httsleep = HttSleeper(URL, {'status_code': 200}, session=session,
                           headers={'req-header': 'myRequest', 'conflict-header': 'req-wins'})
-    with mock.patch('requests.sessions.Session.send') as mock_session_send:
-        mock_session_send.return_value = resp
+    with mock.patch('requests.adapters.HTTPAdapter.send') as mock_adapter_send:
+        mock_adapter_send.return_value = resp
         httsleep.run()
-        assert mock_session_send.called
-        args, kwargs = mock_session_send.call_args
+        assert mock_adapter_send.called
+        args, kwargs = mock_adapter_send.call_args
     assert args[0].headers == {'conflict-header': 'req-wins', 'req-header': 'myRequest', 'session-header': 'mySession'}
 
 
@@ -115,11 +115,11 @@ def test_request_verify_overrules_session_verify():
     resp = Response()
     resp.status_code = 200
     httsleep = HttSleeper(URL, {'status_code': 200}, session=session, verify='/override/path')
-    with mock.patch('requests.sessions.Session.send') as mock_session_send:
-        mock_session_send.return_value = resp
+    with mock.patch('requests.adapters.HTTPAdapter.send') as mock_adapter_send:
+        mock_adapter_send.return_value = resp
         httsleep.run()
-        assert mock_session_send.called
-        args, kwargs = mock_session_send.call_args
+        assert mock_adapter_send.called
+        args, kwargs = mock_adapter_send.call_args
     assert 'verify' in kwargs
     assert kwargs['verify'] == '/override/path'
 
