@@ -3,6 +3,9 @@ httsleep Changelog
 
 Next Version
 ------------
+
+Version 0.3.0
+-------------
 * The kwargs ``verify`` and ``session`` are now supported, allowing users of httsleep to
   specify these in the same way as when directly using the ``requests`` library.
 * The shorthand kwargs (``status_code``, ``json``, ``jsonpath``, ``text``, ``callback``)
