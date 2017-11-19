@@ -88,6 +88,8 @@ def test_until():
 
 def test_empty_until():
     with pytest.raises(ValueError):
+        HttSleeper(URL)
+    with pytest.raises(ValueError):
         HttSleeper(URL, {})
     with pytest.raises(ValueError):
         HttSleeper(URL, [{}])
@@ -122,20 +124,3 @@ def test_invalid_alarms():
 def test_status_code_cast_as_int_in_alarm():
     obj = HttSleeper(URL, CONDITION, alarms={'status_code': '500'})
     assert obj.alarms[0]['status_code'] == 500
-
-
-def test_kwarg_condition():
-    def myfunc(*args):
-        return
-    obj = HttSleeper(URL, status_code=200)
-    assert obj.until == [{'status_code': 200}]
-    obj = HttSleeper(URL, json={'status': 'SUCCESS'})
-    assert obj.until == [{'json': {'status': 'SUCCESS'}}]
-    obj = HttSleeper(URL, jsonpath={'expression': 'status', 'value': 'SUCCESS'})
-    assert obj.until == [{'jsonpath': {'expression': 'status', 'value': 'SUCCESS'}}]
-    obj = HttSleeper(URL, text='done')
-    assert obj.until == [{'text': 'done'}]
-    obj = HttSleeper(URL, callback=myfunc)
-    assert obj.until == [{'callback': myfunc}]
-    obj = HttSleeper(URL, status_code=200, callback=myfunc, json={'status': 'success'})
-    assert obj.until == [{'status_code': 200, 'callback': myfunc, 'json': {'status': 'success'}}]
