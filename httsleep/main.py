@@ -180,7 +180,7 @@ class HttSleeper(object):
         return True
 
 
-def httsleep(url_or_request, until=None, alarms=None, status_code=None,
+def httsleep(url_or_request, until=None, alarms=None,
              auth=None, headers=None, session=DEFAULT_SESSION, verify=None,
              polling_interval=DEFAULT_POLLING_INTERVAL,
              max_retries=DEFAULT_MAX_RETRIES,
@@ -192,7 +192,7 @@ def httsleep(url_or_request, until=None, alarms=None, status_code=None,
     :return: :class:`requests.Response` object.
     """
     return HttSleeper(
-        url_or_request, until=until, alarms=alarms, status_code=status_code,
+        url_or_request, until=until, alarms=alarms,
         auth=auth, headers=headers, session=session, verify=verify,
         polling_interval=polling_interval,
         max_retries=max_retries,
