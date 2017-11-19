@@ -3,8 +3,8 @@ httsleep Changelog
 
 Version NEXT
 -------------
-* The kwarg ``verify`` is now supported, allowing users of httsleep to specify
-  ``verify=False`` in the same way as when directly using the ``requests`` library.
+* The kwargs ``verify`` and ``session`` are now supported, allowing users of httsleep to
+  specify these in the same way as when directly using the ``requests`` library.
 
 Version 0.2.0
 -------------
