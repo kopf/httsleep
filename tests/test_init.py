@@ -74,6 +74,8 @@ def test_until():
 
 def test_empty_until():
     with pytest.raises(ValueError):
+        HttSleeper(URL)
+    with pytest.raises(ValueError):
         HttSleeper(URL, {})
     with pytest.raises(ValueError):
         HttSleeper(URL, [{}])
@@ -108,4 +110,3 @@ def test_invalid_alarms():
 def test_status_code_cast_as_int_in_alarm():
     obj = HttSleeper(URL, CONDITION, alarms={'status_code': '500'})
     assert obj.alarms[0]['status_code'] == 500
-

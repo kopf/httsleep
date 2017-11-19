@@ -43,10 +43,8 @@ class HttSleeper(object):
                  max_retries=DEFAULT_MAX_RETRIES,
                  ignore_exceptions=None,
                  loglevel=logging.ERROR):
-        if until is None:
-            msg = ("No success conditions provided! Either the 'until' kwarg"
-                   " or one of the individual condition kwargs must be provided.")
-            raise ValueError(msg)
+        if not until:
+            raise ValueError("No success conditions provided!")
         if isinstance(url_or_request, string_types):
             self.request = requests.Request(
                 method='GET', url=url_or_request, auth=auth, headers=headers)
