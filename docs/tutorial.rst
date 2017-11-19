@@ -40,6 +40,23 @@ pass a :class:`requests.Request` object in place of the URL in more specific cas
                  data={'payload': 'here'})
    response = httsleep(req, until={'status_code': 200})
 
+.. _Session object: http://docs.python-requests.org/en/master/user/advanced/#session-objects
+
+If you want to share headers, cookies etc. across multiple different HTTP requests (e.g.
+to maintain auth credentials), you might make use of a `Session object`_.
+
+.. code-block:: python
+
+   import requests
+   session = requests.Session()
+   session.verify = False
+   session.headers.update({'Authorization': 'token=%s' % auth_token,
+                           'Content-Type': 'application/json'})
+
+   response = session.post('http://server/jobs/create', data=data)
+   response = httsleep('http://server/jobs/1', session=session, until={'status_code': 200})
+   response = session.get('http://server/jobs/1/output')
+
 If we're polling a server with a dodgy network connection, we might not want to
 break on a :class:`requests.exceptions.ConnectionError`, but instead keep polling:
 
