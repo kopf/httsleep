@@ -10,7 +10,7 @@ success condition. It returns a :class:`requests.Response` object.
 .. code-block:: python
 
    from httsleep import httsleep
-   response = httsleep('http://myendpoint/jobs/1', status_code=200)
+   response = httsleep('http://myendpoint/jobs/1', until={'status_code': 200})
 
 In this example, httsleep will fire a HTTP GET request at ``http://myendpoint/jobs/1``
 every 2 seconds, retrying a maximum of 50 times, until it gets a response with a
@@ -21,7 +21,7 @@ We can change these defaults to poll once a minute, but a maximum of 10 times:
 .. code-block:: python
 
    try:
-       response = httsleep('http://myendpoint/jobs/1', status_code=200,
+       response = httsleep('http://myendpoint/jobs/1', until={'status_code': 200},
                            max_retries=10, polling_interval=60)
    except StopIteration:
        print "Max retries has been exhausted!"
@@ -38,7 +38,7 @@ pass a :class:`requests.Request` object in place of the URL in more specific cas
    from requests import Request
    req = Request('http://myendpoint/jobs/1', method='POST',
                  data={'payload': 'here'})
-   response = httsleep(req, status_code=200)
+   response = httsleep(req, until={'status_code': 200})
 
 If we're polling a server with a dodgy network connection, we might not want to
 break on a :class:`requests.exceptions.ConnectionError`, but instead keep polling:
@@ -46,7 +46,7 @@ break on a :class:`requests.exceptions.ConnectionError`, but instead keep pollin
 .. code-block:: python
 
    from requests.exceptions import ConnectionError
-   response = httsleep('http://myendpoint/jobs/1', status_code=200,
+   response = httsleep('http://myendpoint/jobs/1', until={'status_code': 200},
                        ignore_exceptions=[ConnectionError])
 
 
@@ -73,12 +73,12 @@ status code is received. ``text`` and ``json`` are similar:
 .. code-block:: python
 
    # Poll until the response body is the string "OK!":
-   httsleep('http://myendpoint/jobs/1', text="OK!")
+   httsleep('http://myendpoint/jobs/1', until={'text': 'OK!'})
    # Poll until the json-decoded response has a certain value:
-   httsleep('http://myendpoint/jobs/1', json={'status': 'OK'})
+   httsleep('http://myendpoint/jobs/1', until={'json': {'status': 'OK'}})
 
-If a ``json`` condition is specified but no JSON object could be decoded, a ValueError
-bubbles up. If needs be, this can be ignored by specifying ``ignore_exceptions``.
+If a ``json`` condition is specified but no JSON object could be decoded in the response,
+a ValueError bubbles up. If needs be, this can be ignored by specifying ``ignore_exceptions``.
 
 JSONPath
 ~~~~~~~~
@@ -110,7 +110,7 @@ we can use the following JSONPath query:
 .. code-block:: python
 
    httsleep('http://myendpoint/jobs/1',
-            jsonpath=[{'expression': 'status', 'value': 'OK'}])
+            until={'jsonpath': [{'expression': 'status', 'value': 'OK'}]})
 
 httsleep uses `jsonpath-rw`_ to evaluate JSONPath expressions.
 If you're familiar with this library, you can also use pre-compiled JSONPath expressions:
@@ -119,9 +119,9 @@ If you're familiar with this library, you can also use pre-compiled JSONPath exp
 
    from jsonpath_rw.jsonpath import Fields
    httsleep('http://myendpoint/jobs/1',
-            jsonpath=[{'expression': Fields('status'), 'value': 'OK'}])
+            until={'jsonpath': [{'expression': Fields('status'), 'value': 'OK'}]})
 
-You might notice that the ``jsonpath`` kwarg value is a list. A response has
+You might notice that the ``jsonpath`` value is a list. A response has
 only one status code, and only one body, but multiple JSONPath expressions might
 evaluate true for the JSON content returned. Therefore, you can string multiple JSONPaths
 together in a list. Logically, they will be evaluated with a boolean AND.
@@ -155,7 +155,7 @@ is in the past.
        if last_scheduled_change < datetime.datetime.utcnow():
            return True
 
-   httsleep('http://myendpoint/jobs/1', callback=ensure_scheduled_change_in_past)
+   httsleep('http://myendpoint/jobs/1', until={'callback': ensure_scheduled_change_in_past})
 
 
 Multiple Conditionals
@@ -170,26 +170,8 @@ an empty dict in the JSON body are received:
 .. _multiple-condition-codeblock:
 .. code-block:: python
 
-   httsleep('http://myendpoint/jobs/1', status_code=200, json={})
-
-The ``until`` kwarg
-~~~~~~~~~~~~~~~~~~~
-
-Until now, we've been specifying conditions by using direct kwargs.
-This can be a convenient shorthand for simple cases, but it's a little restrictive.
-It is also deprecated and will be removed in a future release.
-
-There is another way: using the ``until`` kwarg.
-To demonstrate, :ref:`the previous example <multiple-condition-codeblock>` could be rewritten as:
-
-.. code-block:: python
-
    httsleep('http://myendpoint/jobs/1',
             until={'status_code': 200, 'json': {}})
-
-One benefit of this is added readability -- the client *sleeps until* a certain
-response is received. Another is the ability to chain conditions to form not
-just boolean ANDs, but also boolean ORs. More on that later in :ref:`Chaining Conditionals <chaining-conditions>`.
 
 Setting Alarms
 --------------
@@ -199,7 +181,7 @@ Let's return to a previous example:
 .. code-block:: python
 
    # Poll until the json-decoded response has a certain value:
-   httsleep('http://myendpoint/jobs/1', json={'status': 'OK'})
+   httsleep('http://myendpoint/jobs/1', until={'json': {'status': 'OK'}})
 
 What if the job running on the remote server errors out and gets a status of ``ERROR``?
 httsleep would keep polling the endpoint, waiting for a status of ``OK``,
@@ -220,7 +202,8 @@ if the job status is set to ``ERROR``:
 
    from httsleep.exceptions import Alarm
    try:
-       httsleep('http://myendpoint/jobs/1', json={'status': 'OK'},
+       httsleep('http://myendpoint/jobs/1',
+                until={'json': {'status': 'OK'}},
                 alarms={'json': {'status': 'ERROR'}})
    except Alarm as e:
        print "Got a response with status ERROR!"

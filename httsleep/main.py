@@ -22,16 +22,6 @@ class HttSleeper(object):
                   single success condition dict.
     :param alarms: a list of error conditions, respresented by dicts, or a
                    single error condition dict.
-    :param status_code: deprecated. Shorthand for a success condition dependent on the
-                        response's status code.
-    :param json: Deprecated. Shorthand for a success condition dependent on the response's
-                 JSON payload.
-    :param jsonpath: Deprecated. Shorthand for a success condition dependent on the evaluation
-                     of a JSONPath expression.
-    :param text: Deprecated. Shorthand for a success condition dependent on the response's
-                 body payload.
-    :param callback: shorthand for a success condition dependent on a callback
-                     function that takes the response as an argument returning True.
     :param auth: a (username, password) tuple for HTTP authentication.
     :param headers: a dict of HTTP headers.
     :param verify: Either a boolean, in which case it controls whether we verify the server's
@@ -48,16 +38,15 @@ class HttSleeper(object):
 
     """
     def __init__(self, url_or_request, until=None, alarms=None,
-                 status_code=None, json=None, jsonpath=None, text=None, callback=None,
                  auth=None, headers=None, verify=True,
                  polling_interval=DEFAULT_POLLING_INTERVAL,
                  max_retries=DEFAULT_MAX_RETRIES,
                  ignore_exceptions=None,
                  loglevel=logging.ERROR):
-        if status_code or json or jsonpath or text or callback:
-            msg = ("The shorthand kwargs status_code, json, jsonpath, text"
-                   " and callback are deprecated and will soon be removed.")
-            warnings.warn(msg, DeprecationWarning)
+        if until is None:
+            msg = ("No success conditions provided! Either the 'until' kwarg"
+                   " or one of the individual condition kwargs must be provided.")
+            raise ValueError(msg)
         if isinstance(url_or_request, string_types):
             self.request = requests.Request(
                 method='GET', url=url_or_request, auth=auth, headers=headers)
@@ -76,16 +65,6 @@ class HttSleeper(object):
             self.max_retries = int(max_retries)
         else:
             self.max_retries = None
-
-        if until is None and not (status_code or json or jsonpath or text or callback):
-            msg = ("No success conditions provided! Either the 'until' kwarg"
-                   " or one of the individual condition kwargs must be provided.")
-            raise ValueError(msg)
-        elif until is None:
-            until = []
-            condition = {'status_code': status_code, 'json': json,
-                         'jsonpath': jsonpath, 'text': text, 'callback': callback}
-            until.append({k: v for k, v in condition.items() if v})
 
         self.verify = verify
         self.until = until
@@ -197,7 +176,6 @@ class HttSleeper(object):
 
 
 def httsleep(url_or_request, until=None, alarms=None, status_code=None,
-             json=None, jsonpath=None, text=None, callback=None,
              auth=None, headers=None, verify=True,
              polling_interval=DEFAULT_POLLING_INTERVAL,
              max_retries=DEFAULT_MAX_RETRIES,
@@ -210,7 +188,6 @@ def httsleep(url_or_request, until=None, alarms=None, status_code=None,
     """
     return HttSleeper(
         url_or_request, until=until, alarms=alarms, status_code=status_code,
-        json=json, jsonpath=jsonpath, text=text, callback=callback,
         auth=auth, headers=headers, verify=verify,
         polling_interval=polling_interval,
         max_retries=max_retries,

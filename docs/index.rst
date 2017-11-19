@@ -36,7 +36,8 @@ Maybe you want to just poll until you get a HTTP status code 200?
 
 .. code-block:: python
 
-   resp = httsleep('http://server/endpoint', status_code=200)
+   resp = httsleep('http://server/endpoint',
+                   until={'status_code': 200})
 
 This example would be easily replaced with a few lines of Python code.
 However, most real-world cases aren't as simple as this, and your
