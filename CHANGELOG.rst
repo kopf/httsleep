@@ -1,10 +1,12 @@
 httsleep Changelog
 ==================
 
-Version NEXT
--------------
+Next Version
+------------
 * The kwarg ``verify`` is now supported, allowing users of httsleep to specify
   ``verify=False`` in the same way as when directly using the ``requests`` library.
+* The shorthand kwargs (``status_code``, ``json``, ``jsonpath``, ``text``, ``callback``)
+  have been removed.
 
 Version 0.2.0
 -------------
