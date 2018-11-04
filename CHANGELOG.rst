@@ -3,6 +3,9 @@ httsleep Changelog
 
 Next Version
 ------------
+
+Version 0.3.1
+-------------
 * Added 3.6 and 3.7 to the list of supported python versions.
 
 Version 0.3.0
